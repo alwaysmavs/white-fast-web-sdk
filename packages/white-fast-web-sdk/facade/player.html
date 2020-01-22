@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="keywords" content="实时, 协作, 在线教育, 会议, 设计, 白板云服务">
+    <meta name="description" content="Netless 接入即互动">
+    <meta name="author" content="丢了兔子，Netless, 它山石">
+    <meta name="robots" content="index,follow">
+    <meta name="theme-color" content="#000000">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=0">
+    <meta content="yes" name="apple-mobile-web-app-capable">
+    <meta content="yes" name="apple-touch-fullscreen">
+    <meta content="telephone=no,email=no" name="format-detection">
+    <title>Netless</title>
+    <style>
+        #app-root {
+            width: 100%;
+            height: 100vh;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app-root"></div>
+    <script src="http://localhost:8080/bundle.js"></script>
+    <script>
+        // var sdkToken = "WHITEcGFydG5lcl9pZD0zZHlaZ1BwWUtwWVN2VDVmNGQ4UGI2M2djVGhncENIOXBBeTcmc2lnPTc1MTBkOWEwNzM1ZjA2MDYwMTMzODBkYjVlNTQ2NDA0OTAzOWU2NjE6YWRtaW5JZD0xNTgmcm9sZT1taW5pJmV4cGlyZV90aW1lPTE1OTAwNzM1NjEmYWs9M2R5WmdQcFlLcFlTdlQ1ZjRkOFBiNjNnY1RoZ3BDSDlwQXk3JmNyZWF0ZV90aW1lPTE1NTg1MTY2MDkmbm9uY2U9MTU1ODUxNjYwODYxNzAw";
+        // var url = 'https://cloudcapiv4.herewhite.com/room?token=' + sdkToken;
+        // var requestInit = {
+        //     method: 'POST',
+        //     headers: {
+        //         "content-type": "application/json",
+        //     },
+        //     body: JSON.stringify({
+        //         name: '我的第一个 White 房间',
+        //         limit: 100, // 房间人数限制
+        //     }),
+        // };
+        // fetch(url, requestInit).then(function(response) {
+        //     // Step1: 服务器返回房间唯一标识 uuid 和 进入房间的秘钥 roomToken
+        //     return response.json();
+        // }).then(function(json) {
+            // Step2: 加入房间
+            // var uuid = json.msg.room.uuid;
+            // var roomToken = json.msg.roomToken;
+        // uuid: string;
+        // roomToken: string;
+        // time: string;
+        // userInf: UserType;
+        // duration?: number;
+        // beginTimestamp?: number,
+        //     room?: string,
+        //     mediaUrl?: string,
+        //     isChatOpen?: boolean;
+        // logoUrl?: boolean;
+        var userId = `${Math.floor(Math.random() * 100000)}`;
+        var uuid = "8c2ee602f11e4883a75a9be9dd51b4cd";
+        var roomToken = "WHITEcGFydG5lcl9pZD0zZHlaZ1BwWUtwWVN2VDVmNGQ4UGI2M2djVGhncENIOXBBeTcmc2lnPWFhODIxMTQ5NjdhZDdmMmVlMzI1NmJhNjUwNmM2OTJmMzFkNGZiODg6YWRtaW5JZD0xNTgmcm9vbUlkPThjMmVlNjAyZjExZTQ4ODNhNzVhOWJlOWRkNTFiNGNkJnRlYW1JZD0yODMmcm9sZT1yb29tJmV4cGlyZV90aW1lPTE2MDA1MTI0OTYmYWs9M2R5WmdQcFlLcFlTdlQ1ZjRkOFBiNjNnY1RoZ3BDSDlwQXk3JmNyZWF0ZV90aW1lPTE1Njg5NTU1NDQmbm9uY2U9MTU2ODk1NTU0NDAwMjAw";
+        WhiteFastSDK.Player("app-root",{
+                uuid: uuid,
+                roomToken: roomToken,
+                userId: userId,
+                userName: "伍双",
+                userAvatarUrl: "https://ohuuyffq2.qnssl.com/netless_icon.png",
+                logoUrl: "https://white-sdk.oss-cn-beijing.aliyuncs.com/video/netless_black.svg",
+                boardBackgroundColor: "#F2F2F2",
+                playerCallback: (player) => {
+                    console.log(player);
+                },
+                // beginTimestamp:
+                // duration:
+                mediaUrl: "https://netless-media.oss-cn-hangzhou.aliyuncs.com/ad5ce237124d7210e24ca5838d79f509_b9fc17d5d017466ab446c3094c87b1b3.m3u8",
+                // isChatOpen:
+            });
+        // }).catch(function(err) {
+        //     console.log(err);
+        // });
+    </script>
+</body>
+
+</html>
