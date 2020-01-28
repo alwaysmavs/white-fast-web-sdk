@@ -7,7 +7,7 @@ import * as handup from "../../assets/image/handup.svg";
 import * as handup_black from "../../assets/image/handup_black.svg";
 import "./WhiteboardBottomRight.less";
 import {Badge, message, Tooltip} from "antd";
-import {Room, DeviceType, ViewMode} from "white-web-sdk";
+import {Room, DeviceType, ViewMode, RoomState} from "white-web-sdk";
 import {GuestUserType, HostUserType} from "../../pages/RoomManager";
 import {isMobile} from "react-device-detect";
 import {ClassModeType, LanguageEnum} from "../../pages/NetlessRoomTypes";
@@ -30,6 +30,7 @@ export type hotkeyTooltipState = {
 
 export type WhiteboardBottomRightProps = {
     room: Room;
+    roomState: RoomState;
     userId: string;
     handleAnnexBoxMenuState: () => void;
     handleChatState: () => void;
@@ -64,9 +65,9 @@ class WhiteboardBottomRight extends React.Component<WhiteboardBottomRightProps, 
     }
 
     private pageNumber = (): React.ReactNode => {
-        const {deviceType, room} = this.props;
-        const activeIndex = room.state.sceneState.index;
-        const scenes = room.state.sceneState.scenes;
+        const {deviceType, roomState} = this.props;
+        const activeIndex = roomState.sceneState.index;
+        const scenes = roomState.sceneState.scenes;
         const isMobile = deviceType === DeviceType.Touch;
         if (isMobile) {
             return (
@@ -106,8 +107,8 @@ class WhiteboardBottomRight extends React.Component<WhiteboardBottomRightProps, 
         }
     }
     private handlePptPreviousStep = async (): Promise<void> => {
-        const {room} = this.props;
-        const currentPage = room.state.sceneState.index + 1;
+        const {room, roomState} = this.props;
+        const currentPage = roomState.sceneState.index + 1;
         const previousPage = currentPage - 1;
         const jumpPageMessage = {toPage: previousPage, method: "onJumpPage", sendUserId: "a1001576140868974"};
         this.handlePushToIframe(JSON.stringify(jumpPageMessage));
@@ -115,8 +116,8 @@ class WhiteboardBottomRight extends React.Component<WhiteboardBottomRightProps, 
         room.pptPreviousStep();
     }
     private handlePptNextStep = async (): Promise<void> => {
-        const {room} = this.props;
-        const currentPage = room.state.sceneState.index + 1;
+        const {room, roomState} = this.props;
+        const currentPage = roomState.sceneState.index + 1;
         const nextPage = currentPage + 1;
         const jumpPageMessage = {toPage: nextPage, method: "onJumpPage", sendUserId: "a1001576140868974"};
         this.handlePushToIframe(JSON.stringify(jumpPageMessage));
@@ -141,7 +142,7 @@ class WhiteboardBottomRight extends React.Component<WhiteboardBottomRightProps, 
         );
     }
     private getSelfUserInfo = (): GuestUserType | null => {
-        const globalGuestUsers: GuestUserType[] = this.props.room.state.globalState.guestUsers;
+        const globalGuestUsers: GuestUserType[] = this.props.roomState.globalState.guestUsers;
         if (globalGuestUsers) {
             const self = globalGuestUsers.find((user: GuestUserType) => user.userId === this.props.userId);
             if (self) {
@@ -154,8 +155,9 @@ class WhiteboardBottomRight extends React.Component<WhiteboardBottomRightProps, 
         }
     }
     private handleHandup = (mode: ClassModeType, room: Room, userId?: string): void => {
-        const globalGuestUsers: GuestUserType[] = room.state.globalState.guestUsers;
-        const selfHostInfo: HostUserType = room.state.globalState.hostInfo;
+        const {roomState} = this.props;
+        const globalGuestUsers: GuestUserType[] = roomState.globalState.guestUsers;
+        const selfHostInfo: HostUserType = roomState.globalState.hostInfo;
         if (userId) {
             if (mode === ClassModeType.lecture && globalGuestUsers) {
                 const users = globalGuestUsers.map((user: GuestUserType) => {
@@ -207,8 +209,8 @@ class WhiteboardBottomRight extends React.Component<WhiteboardBottomRightProps, 
     }
 
     private renderHandUpBtn = (): React.ReactNode => {
-        const {room} = this.props;
-        const hostInfo = room.state.globalState.hostInfo;
+        const {room, roomState} = this.props;
+        const hostInfo = roomState.globalState.hostInfo;
         if (hostInfo && hostInfo.classMode === ClassModeType.lecture && hostInfo.isAllowHandUp) {
             const user = this.getSelfUserInfo();
             if (user) {

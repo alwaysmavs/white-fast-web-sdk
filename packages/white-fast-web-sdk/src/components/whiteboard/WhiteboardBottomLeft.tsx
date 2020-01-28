@@ -1,5 +1,5 @@
 import * as React from "react";
-import {DeviceType, Room} from "white-web-sdk";
+import {DeviceType, Room, RoomState} from "white-web-sdk";
 import {observer} from "mobx-react";
 import "./WhiteboardBottomLeft.less";
 import ScaleController from "../../tools/scaleController";
@@ -20,6 +20,7 @@ export type WhiteboardBottomLeftProps = {
     isManagerOpen: boolean | null;
     identity?: IdentityType;
     isReadOnly?: boolean;
+     roomState: RoomState;
 };
 
 @observer
@@ -54,8 +55,8 @@ class WhiteboardBottomLeft extends React.Component<WhiteboardBottomLeftProps, {}
         }
     }
     private isHavePpt = (): boolean => {
-        const {room} = this.props;
-        return !!(room.state.globalState && room.state.globalState.h5PptUrl);
+        const {roomState} = this.props;
+        return !!(roomState.globalState && roomState.globalState.h5PptUrl);
     }
 
     private handlePptClick = (): void => {
@@ -104,12 +105,12 @@ class WhiteboardBottomLeft extends React.Component<WhiteboardBottomLeftProps, {}
     }
 
     public render(): React.ReactNode {
-        const {isReadOnly, room} = this.props;
+        const {isReadOnly, room, roomState} = this.props;
         if (isReadOnly) {
             return <div className="whiteboard-box-bottom-left">
                 <div className="whiteboard-box-mid">
                     <ScaleController
-                        zoomScale={room.state.zoomScale}
+                        zoomScale={roomState.zoomScale}
                         isReadOnly={this.props.isReadOnly}
                         deviceType={this.props.deviceType}
                         zoomChange={this.zoomChange}/>
@@ -119,15 +120,15 @@ class WhiteboardBottomLeft extends React.Component<WhiteboardBottomLeftProps, {}
         return (
             <div className="whiteboard-box-bottom-left">
                 <div className="whiteboard-box-mid">
-                    {/* {this.isHavePpt() &&
+                    {this.isHavePpt() &&
                     <Popover title={"H5 课件操作"} placement="topLeft" content={this.renderPptPopover()} trigger="hover">
                         <div onClick={this.handlePptClick} className="whiteboard-click-icon">
                             {roomStore.boardPointerEvents === "auto" ? <img src={click_icon}/> : <img src={click_icon_black}/>}
                         </div>
-                    </Popover>} */}
+                    </Popover>}
                     {this.renderFileIcon()}
                     <ScaleController
-                        zoomScale={room.state.zoomScale}
+                        zoomScale={roomState.zoomScale}
                         deviceType={this.props.deviceType}
                         zoomChange={this.zoomChange}/>
                 </div>

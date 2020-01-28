@@ -1,6 +1,6 @@
 import * as React from "react";
 import "./ClassroomMedia.less";
-import {Room, ViewMode} from "white-web-sdk";
+import {Room, ViewMode, RoomState} from "white-web-sdk";
 import {Button, Radio, Tooltip, notification, Icon, message} from "antd";
 import {GuestUserType, HostUserType} from "../../pages/RoomManager";
 import * as set_video from "../../assets/image/set_video.svg";
@@ -45,6 +45,7 @@ export type ClassroomMediaProps = {
     classMode: ClassModeType;
     handleManagerState: () => void;
     applyForRtc: boolean;
+    roomState: RoomState;
     isVideoEnable: boolean;
     isAllowHandUp: boolean;
     identity?: IdentityType;
@@ -374,7 +375,7 @@ class ClassroomMedia extends React.Component<ClassroomMediaProps, ClassroomMedia
     }
 
     private renderRtcBtn = (): React.ReactNode => {
-        const {rtc, room, identity} = this.props;
+        const {rtc, identity, room} = this.props;
         const hostInfo: HostUserType = room.state.globalState.hostInfo;
         if (rtc) {
             if (hostInfo.classMode === ClassModeType.discuss) {
@@ -671,10 +672,10 @@ class ClassroomMedia extends React.Component<ClassroomMediaProps, ClassroomMedia
 
 
     private setMediaState = (state: boolean): void => {
-        const {room, identity} = this.props;
+        const {room, roomState, identity} = this.props;
         if (identity === IdentityType.host) {
             room.setGlobalState({hostInfo: {
-                    ...room.state.globalState.hostInfo,
+                    ...roomState.globalState.hostInfo,
                     isVideoEnable: state,
                 }});
         }
@@ -891,8 +892,8 @@ class ClassroomMedia extends React.Component<ClassroomMediaProps, ClassroomMedia
     }
 
     private getStreamIdentity = (userId: number): IdentityType => {
-        const {room} = this.props;
-        const roomMember = room.state.roomMembers.find((roomMember: any) => {
+        const {room, roomState} = this.props;
+        const roomMember = roomState.roomMembers.find((roomMember: any) => {
             if (roomMember.payload && roomMember.payload.userId !== undefined) {
                 if (parseInt(roomMember.payload.userId) === userId) {
                     return roomMember;

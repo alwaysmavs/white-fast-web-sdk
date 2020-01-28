@@ -1,9 +1,12 @@
 import {observable} from "mobx";
 import {IdentityType, RecordDataType} from "../pages/NetlessRoomTypes";
+import { RoomState } from "white-react-sdk";
 
 export class RoomStore {
     @observable
     public boardPointerEvents: any = "auto";
+    @observable
+    public roomState: Partial<RoomState>;
     @observable
     public identity: IdentityType = IdentityType.guest;
     @observable
