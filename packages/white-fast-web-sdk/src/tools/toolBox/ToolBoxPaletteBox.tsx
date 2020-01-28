@@ -6,13 +6,13 @@ import isColor from "is-color";
 import {message} from "antd";
 import ToolBoxAddColor from "./ToolBoxAddColor";
 import {RoomContextConsumer} from "../../pages/RoomContext";
-import {LanguageEnum} from "../../pages/NetlessRoomTypes";
 import { observer } from "mobx-react";
 import { projectStore } from "../../models/ProjectStore";
+import { Room, RoomState} from "white-react-sdk";
 export type ToolBoxPaletteBoxProps = {
     displayStroke: boolean;
-    setMemberState: (modifyState: Partial<any>) => void;
-    memberState: Readonly<any>;
+    room: Room;
+    roomState: RoomState;
     colorConfig?: string[];
 };
 
@@ -32,8 +32,9 @@ class ToolBoxPaletteBox extends React.Component<ToolBoxPaletteBoxProps, ToolBoxP
     }
 
     private setStrokeWidth(event: Event): void {
+        const {room} = this.props;
         const strokeWidth = parseInt((event.target as any).value);
-        this.props.setMemberState({strokeWidth: strokeWidth});
+        room.setMemberState({strokeWidth: strokeWidth});
     }
 
     public render(): React.ReactNode {
@@ -71,14 +72,16 @@ class ToolBoxPaletteBox extends React.Component<ToolBoxPaletteBoxProps, ToolBoxP
     }
 
     private appendNewColor = (color: string): void => {
+        const {room} = this.props;
         const colorArray = this.state.colorConfig;
         colorArray.push(color);
         this.setState({colorConfig: colorArray});
         const newColor = this.hexToRgb(color);
-        this.props.setMemberState({strokeColor: newColor});
+        room.setMemberState({strokeColor: newColor});
     }
 
     private renderColorCellArray = (): React.ReactNode => {
+        const {room} = this.props;
         const {colorConfig} = this.state;
         const nodes = colorConfig.map((color, index) => {
             if (this.isEffectiveColor(color)) {
@@ -90,7 +93,7 @@ class ToolBoxPaletteBox extends React.Component<ToolBoxPaletteBoxProps, ToolBoxP
                 return (
                     <div className={className}
                          key={`${index}`}
-                         onClick={() => this.props.setMemberState({strokeColor: newColor})}>
+                         onClick={() => room.setMemberState({strokeColor: newColor})}>
                         <div className="palette-color"
                              style={{backgroundColor: `rgb(${r},${g},${b})`}}/>
                     </div>
@@ -117,7 +120,7 @@ class ToolBoxPaletteBox extends React.Component<ToolBoxPaletteBoxProps, ToolBoxP
     }
 
     private isMatchColor(color: any): boolean {
-        const {strokeColor} = this.props.memberState;
+        const {strokeColor} = this.props.room.state.memberState;
         return (
             strokeColor[0] === color[0] &&
             strokeColor[1] === color[1] &&
@@ -126,8 +129,8 @@ class ToolBoxPaletteBox extends React.Component<ToolBoxPaletteBoxProps, ToolBoxP
     }
 
     private renderStrokeSelector(): React.ReactNode {
-        const {memberState} = this.props;
-        const [r, g, b] = memberState.strokeColor;
+        const {room} = this.props;
+        const [r, g, b] = room.state.memberState.strokeColor;
         return [
             <div key="title" className="palette-title-two">{projectStore.isEnglish() ? "Width" : "宽度"}</div>,
             <div key="box" className="palette-stroke-width-box">
@@ -140,9 +143,9 @@ class ToolBoxPaletteBox extends React.Component<ToolBoxPaletteBoxProps, ToolBoxP
                            min={2}
                            max={32}
                            onChange={this.setStrokeWidth.bind(this)}
-                           defaultValue={`${this.props.memberState.strokeWidth}`}
+                           defaultValue={`${room.state.memberState.strokeWidth}`}
                            onMouseUp={
-                               () => this.props.setMemberState({strokeWidth: this.props.memberState.strokeWidth})
+                               () => room.setMemberState({strokeWidth: room.state.memberState.strokeWidth})
                            }/>
                 </div>
             </div>,

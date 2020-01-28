@@ -16,7 +16,7 @@ import {isMobile} from "react-device-detect";
 import {ToolBarPositionEnum} from "../../pages/NetlessRoomTypes";
 import {DisplayProperty} from "csstype";
 import {roomStore} from "../../models/RoomStore";
-import {Room} from "white-web-sdk";
+import {Room, RoomState} from "white-web-sdk";
 
 type ApplianceDescription = {
     readonly iconView: React.ComponentClass<IconProps>;
@@ -38,6 +38,7 @@ export type MemberState = {
 };
 export type ToolBoxProps = {
     room: Room;
+    roomState: RoomState;
     isReadOnly?: boolean;
     toolBarPosition?: ToolBarPositionEnum;
     colorConfig?: string[];
@@ -303,10 +304,11 @@ export default class ToolBox extends React.Component<ToolBoxProps, ToolBoxStates
     }
 
     private renderToolBoxPaletteBox(isSelected: boolean, description: ApplianceDescription): React.ReactNode {
-        const {room} = this.props;
+        const {room, roomState} = this.props;
         return <ToolBoxPaletteBox colorConfig={this.props.colorConfig}
-                                  memberState={room.state.memberState}
-                                  setMemberState={room.setMemberState}
+                                  room={room}
+                                  roomState={roomState}
                                   displayStroke={description.hasStroke}/>;
     }
 }
+

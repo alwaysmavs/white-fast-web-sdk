@@ -7,7 +7,7 @@ import * as handup from "../../assets/image/handup.svg";
 import * as handup_black from "../../assets/image/handup_black.svg";
 import "./WhiteboardBottomRight.less";
 import {Badge, message, Tooltip} from "antd";
-import {Room, DeviceType, ViewMode} from "white-web-sdk";
+import {Room, DeviceType, ViewMode, RoomState} from "white-web-sdk";
 import {GuestUserType, HostUserType} from "../../pages/RoomManager";
 import {isMobile} from "react-device-detect";
 import {ClassModeType, LanguageEnum} from "../../pages/NetlessRoomTypes";
@@ -36,6 +36,7 @@ export type WhiteboardBottomRightProps = {
     deviceType: DeviceType;
     isReadOnly?: boolean;
     isManagerOpen: boolean | null;
+    roomState: RoomState;
 };
 
 @observer

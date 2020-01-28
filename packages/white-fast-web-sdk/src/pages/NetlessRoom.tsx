@@ -13,6 +13,7 @@ import {
     DeviceType,
     RoomWhiteboard,
     createPlugins,
+    RoomState,
 } from "white-react-sdk";
 import "white-web-sdk/style/index.css";
 import PageError from "../components/PageError";
@@ -64,6 +65,7 @@ export type NetlessRoomStates = {
     isChatOpen: boolean;
     isFileOpen: boolean;
     room?: Room;
+    roomState?: RoomState;
     pptConverter?: PptConverter;
     progressDescription?: string,
     fileUrl?: string;
@@ -151,6 +153,7 @@ class NetlessRoom extends React.Component<NetlessRoomProps, NetlessRoomStates> i
                         console.error("kicked with reason: " + reason);
                     },
                     onRoomStateChanged: modifyState => {
+                        this.setState({roomState: modifyState as RoomState});
                         if (modifyState.roomMembers) {
                             cursor.setColorAndAppliance(modifyState.roomMembers);
                         }
@@ -172,7 +175,7 @@ class NetlessRoom extends React.Component<NetlessRoomProps, NetlessRoomStates> i
                     this.initDocumentState(room);
                 }
             }
-            this.setState({room: room, roomToken: roomToken});
+            this.setState({room: room, roomToken: roomToken, roomState: room.state});
         } else {
             message.error("join fail");
         }
@@ -608,7 +611,7 @@ class NetlessRoom extends React.Component<NetlessRoomProps, NetlessRoomStates> i
         room.disableCameraTransform = roomStore.isScreenZoomLock;
     }
     public render(): React.ReactNode {
-        const {phase, connectedFail, room} = this.state;
+        const {phase, connectedFail, room, roomState} = this.state;
         const {loadingSvgUrl} = this.props;
         const isReadOnly = this.detectIsReadOnly();
         if (connectedFail || phase === RoomPhase.Disconnected) {
@@ -623,6 +626,10 @@ class NetlessRoom extends React.Component<NetlessRoomProps, NetlessRoomStates> i
                         phase={phase}
                         loadingSvgUrl={loadingSvgUrl}/>;
         } else if (!room) {
+            return <LoadingPage
+                        phase={phase}
+                        loadingSvgUrl={loadingSvgUrl}/>;
+        } else if (!roomState) {
             return <LoadingPage
                         phase={phase}
                         loadingSvgUrl={loadingSvgUrl}/>;
@@ -686,6 +693,7 @@ class NetlessRoom extends React.Component<NetlessRoomProps, NetlessRoomStates> i
                                 isReadOnly={isReadOnly}
                                 userAvatarUrl={this.props.userAvatarUrl}/>
                             <WhiteboardBottomLeft
+                                roomState={roomState}
                                 handleFileState={this.handleFileState}
                                 isManagerOpen={this.state.isManagerOpen}
                                 isReadOnly={isReadOnly}
@@ -693,6 +701,7 @@ class NetlessRoom extends React.Component<NetlessRoomProps, NetlessRoomStates> i
                                 deviceType={this.state.deviceType}
                                 room={room}/>
                             <WhiteboardBottomRight
+                                roomState={roomState}
                                 isManagerOpen={this.state.isManagerOpen}
                                 deviceType={this.state.deviceType}
                                 userId={this.props.userId}
@@ -703,6 +712,7 @@ class NetlessRoom extends React.Component<NetlessRoomProps, NetlessRoomStates> i
                             {this.renderRecordComponent()}
                             <ToolBox
                                 room={room}
+                                roomState={roomState}
                                 isReadOnly={isReadOnly}
                                 toolBarPosition={this.props.toolBarPosition}
                                 colorConfig={this.props.defaultColorArray}

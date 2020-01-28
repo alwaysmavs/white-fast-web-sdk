@@ -1,5 +1,5 @@
 import * as React from "react";
-import {DeviceType, Room} from "white-web-sdk";
+import {DeviceType, Room, RoomState} from "white-web-sdk";
 import {observer} from "mobx-react";
 import "./WhiteboardBottomLeft.less";
 import ScaleController from "../../tools/scaleController";
@@ -20,6 +20,7 @@ export type WhiteboardBottomLeftProps = {
     isManagerOpen: boolean | null;
     identity?: IdentityType;
     isReadOnly?: boolean;
+    roomState: RoomState;
 };
 
 @observer
@@ -104,12 +105,12 @@ class WhiteboardBottomLeft extends React.Component<WhiteboardBottomLeftProps, {}
     }
 
     public render(): React.ReactNode {
-        const {isReadOnly, room} = this.props;
+        const {isReadOnly, room, roomState} = this.props;
         if (isReadOnly) {
             return <div className="whiteboard-box-bottom-left">
                 <div className="whiteboard-box-mid">
                     <ScaleController
-                        zoomScale={room.state.zoomScale}
+                        zoomScale={roomState.zoomScale}
                         isReadOnly={this.props.isReadOnly}
                         deviceType={this.props.deviceType}
                         zoomChange={this.zoomChange}/>
@@ -127,7 +128,7 @@ class WhiteboardBottomLeft extends React.Component<WhiteboardBottomLeftProps, {}
                     </Popover>} */}
                     {this.renderFileIcon()}
                     <ScaleController
-                        zoomScale={room.state.zoomScale}
+                        zoomScale={roomState.zoomScale}
                         deviceType={this.props.deviceType}
                         zoomChange={this.zoomChange}/>
                 </div>
