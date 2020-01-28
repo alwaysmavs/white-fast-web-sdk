@@ -2,12 +2,13 @@ import * as React from "react";
 import "./WebPpt.less";
 import {WebCourseController} from "../tools/WebCourseController";
 import {
-    Room,
+    Room, RoomState,
 } from "white-web-sdk";
 import {IdentityType} from "./NetlessRoomTypes";
 import {roomStore} from "../models/RoomStore";
 export type WebPptProps = {
     room: Room;
+    roomState: RoomState;
     ppt?: any;
     identity?: IdentityType;
 };
@@ -40,20 +41,20 @@ class WebPpt extends React.Component<WebPptProps, WebPptStates> {
     }
 
     private isHavePpt = (): boolean => {
-        const {room} = this.props;
-        const isHave = !!(room.state.globalState && room.state.globalState.h5PptUrl);
+        const {roomState} = this.props;
+        const isHave = !!(roomState.globalState && roomState.globalState.h5PptUrl);
         if (isHave) {
             roomStore.isScreenZoomLock = true;
         }
         return isHave;
     }
     public render(): React.ReactNode {
-        const {room} = this.props;
+        const {roomState} = this.props;
         return (
             <div className="whiteboard-h5-ppt">
-                {/* {this.isHavePpt() &&
-                <iframe  id="calculation-under" frameBorder={0} src={room.state.globalState.h5PptUrl}>
-                </iframe>} */}
+                {this.isHavePpt() &&
+                <iframe  id="calculation-under" frameBorder={0} src={roomState.globalState.h5PptUrl}>
+                </iframe>}
             </div>
         );
     }

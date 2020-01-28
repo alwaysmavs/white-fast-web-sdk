@@ -1,6 +1,6 @@
 import * as React from "react";
 import "./ClassroomMedia.less";
-import {Room, ViewMode} from "white-web-sdk";
+import {Room, ViewMode, RoomState} from "white-web-sdk";
 import {Button, Radio, Tooltip, notification, Icon, message} from "antd";
 import {GuestUserType, HostUserType} from "../../pages/RoomManager";
 import * as set_video from "../../assets/image/set_video.svg";
@@ -50,6 +50,7 @@ export type ClassroomMediaProps = {
     identity?: IdentityType;
     rtc?: RtcType;
     userAvatarUrl?: string;
+    roomState: RoomState;
 };
 
 @observer
@@ -190,7 +191,7 @@ class ClassroomMedia extends React.Component<ClassroomMediaProps, ClassroomMedia
         }
 
         if (this.props.applyForRtc !== nextProps.applyForRtc) {
-            const hostInfo: HostUserType = this.props.room.state.globalState.hostInfo;
+            const hostInfo: HostUserType = this.props.roomState.globalState.hostInfo;
             if (hostInfo.classMode === ClassModeType.lecture && nextProps.applyForRtc && nextProps.isVideoEnable) {
                 const {rtc, userId} = this.props;
                 const {localStream} = this.state;
@@ -247,8 +248,9 @@ class ClassroomMedia extends React.Component<ClassroomMediaProps, ClassroomMedia
     }
 
     private handleHandup = (classMode: ClassModeType, room: Room, userId?: string): void => {
-        const globalGuestUsers: GuestUserType[] = room.state.globalState.guestUsers;
-        const selfHostInfo: HostUserType = room.state.globalState.hostInfo;
+        const {roomState} = this.props;
+        const globalGuestUsers: GuestUserType[] = roomState.globalState.guestUsers;
+        const selfHostInfo: HostUserType = roomState.globalState.hostInfo;
         if (userId) {
             if (classMode === ClassModeType.lecture && globalGuestUsers) {
                 const users = globalGuestUsers.map((user: GuestUserType) => {
@@ -287,8 +289,8 @@ class ClassroomMedia extends React.Component<ClassroomMediaProps, ClassroomMedia
     }
 
     private renderHostController = (hostInfo: HostUserType): React.ReactNode => {
-        const {room} = this.props;
-        const guestUsers: GuestUserType[] = room.state.globalState.guestUsers;
+        const {room, roomState} = this.props;
+        const guestUsers: GuestUserType[] = roomState.globalState.guestUsers;
         if (hostInfo.classMode) {
             if (this.props.identity === IdentityType.host) {
                 return (
@@ -374,8 +376,8 @@ class ClassroomMedia extends React.Component<ClassroomMediaProps, ClassroomMedia
     }
 
     private renderRtcBtn = (): React.ReactNode => {
-        const {rtc, room, identity} = this.props;
-        const hostInfo: HostUserType = room.state.globalState.hostInfo;
+        const {rtc, roomState, identity} = this.props;
+        const hostInfo: HostUserType = roomState.globalState.hostInfo;
         if (rtc) {
             if (hostInfo.classMode === ClassModeType.discuss) {
                 if (identity === IdentityType.listener && !hostInfo.isVideoEnable) {
@@ -429,8 +431,8 @@ class ClassroomMedia extends React.Component<ClassroomMediaProps, ClassroomMedia
     }
 
     private renderHost = (): React.ReactNode => {
-        const {room, handleManagerState} = this.props;
-        const hostInfo: HostUserType = room.state.globalState.hostInfo;
+        const {roomState, handleManagerState} = this.props;
+        const hostInfo: HostUserType = roomState.globalState.hostInfo;
         if (hostInfo) {
             return (
                 <div className="manager-box-inner-host">
@@ -577,8 +579,8 @@ class ClassroomMedia extends React.Component<ClassroomMediaProps, ClassroomMedia
     }
 
     public render(): React.ReactNode {
-        const {room} = this.props;
-        const hostInfo: HostUserType = room.state.globalState.hostInfo;
+        const {roomState} = this.props;
+        const hostInfo: HostUserType = roomState.globalState.hostInfo;
         return (
             <div className="netless-video-out-box">
                {!this.state.isRtcStart &&
@@ -671,20 +673,15 @@ class ClassroomMedia extends React.Component<ClassroomMediaProps, ClassroomMedia
 
 
     private setMediaState = (state: boolean): void => {
-        const {room, identity} = this.props;
+        const {room, identity, roomState} = this.props;
         if (identity === IdentityType.host) {
             room.setGlobalState({hostInfo: {
-                    ...room.state.globalState.hostInfo,
+                    ...roomState.globalState.hostInfo,
                     isVideoEnable: state,
                 }});
         }
     }
 
-    private startRecord = (): void => {
-        if (roomStore.startRecord) {
-            roomStore.startRecord();
-        }
-    }
     private startRtc = async () => {
         const {rtc, classMode, userId, channelId, identity} = this.props;
         if (rtc) {
@@ -716,19 +713,17 @@ class ClassroomMedia extends React.Component<ClassroomMediaProps, ClassroomMedia
                             console.log("User " + uid + " join channel successfully");
                             // 创建本地流对象
                             if (identity === IdentityType.host) {
-                                this.createLocalStream(userId);
+                                this.createLocalStream(userId, identity);
                             } else if (identity === IdentityType.guest) {
                                 if (classMode === ClassModeType.discuss) {
                                     this.createLocalStream(userId);
                                 } else {
                                     this.setMediaState(true);
                                     this.setState({isRtcStart: true, isRtcLoading: false});
-                                    this.startRecord();
                                 }
                             } else {
                                 this.setMediaState(true);
                                 this.setState({isRtcStart: true, isRtcLoading: false});
-                                this.startRecord();
                             }
                             // 添加监听
                         }, (err: any) => {
@@ -752,7 +747,7 @@ class ClassroomMedia extends React.Component<ClassroomMediaProps, ClassroomMedia
                     this.setState({ isRtcStart: true, isRtcLoading: false, streams: streams ? streams.map((t: any) => this.convertZegoStream(t)) : [] }, () => {
                         this.createLocalStream(userId, streams);
                     });
-                    this.startRecord();
+                    roomStore.isRtcOpen = true;
                 }
                 default: {
                     break;
@@ -773,6 +768,7 @@ class ClassroomMedia extends React.Component<ClassroomMediaProps, ClassroomMedia
                     this.unpublishStream();
                     this.agoraClient.leave(() => {
                         this.setState({streams: [], isRtcStart: false, isMaskAppear: false});
+                        roomStore.isRtcOpen = false;
                         this.setMediaState(false);
                         if (localStream) {
                             if (localStream.isPlaying()) {
@@ -793,6 +789,7 @@ class ClassroomMedia extends React.Component<ClassroomMediaProps, ClassroomMedia
                 if (this.zegoClient) {
                     this.zegoClient.unInitSDK();
                     this.setState({streams: [], isRtcStart: false, isMaskAppear: false, localStream: null});
+                    roomStore.isRtcOpen = false;
                 }
                 break;
             }
@@ -834,7 +831,7 @@ class ClassroomMedia extends React.Component<ClassroomMediaProps, ClassroomMedia
         }
     }
 
-    private createLocalStream = (userId: number, streams?: any[]): void => {
+    private createLocalStream = (userId: number, identity?: IdentityType): void => {
         const { rtc } = this.props;
         if (!rtc) { return; }
         const { rtcObj, type } = rtc as RtcType;
@@ -857,7 +854,9 @@ class ClassroomMedia extends React.Component<ClassroomMediaProps, ClassroomMedia
                         isCameraOpen: true,
                         isMicrophoneOpen: true,
                         localStream: localStream});
-                    this.startRecord();
+                    if (identity === IdentityType.host) {
+                        roomStore.isRtcOpen = true;
+                    }
                 }, (err: any) => {
                     console.log("getUserMedia failed", err);
                 });
@@ -891,8 +890,8 @@ class ClassroomMedia extends React.Component<ClassroomMediaProps, ClassroomMedia
     }
 
     private getStreamIdentity = (userId: number): IdentityType => {
-        const {room} = this.props;
-        const roomMember = room.state.roomMembers.find((roomMember: any) => {
+        const {roomState} = this.props;
+        const roomMember = roomState.roomMembers.find((roomMember: any) => {
             if (roomMember.payload && roomMember.payload.userId !== undefined) {
                 if (parseInt(roomMember.payload.userId) === userId) {
                     return roomMember;

@@ -120,7 +120,7 @@ class ToolBoxPaletteBox extends React.Component<ToolBoxPaletteBoxProps, ToolBoxP
     }
 
     private isMatchColor(color: any): boolean {
-        const {strokeColor} = this.props.room.state.memberState;
+        const {strokeColor} = this.props.roomState.memberState;
         return (
             strokeColor[0] === color[0] &&
             strokeColor[1] === color[1] &&
@@ -129,8 +129,8 @@ class ToolBoxPaletteBox extends React.Component<ToolBoxPaletteBoxProps, ToolBoxP
     }
 
     private renderStrokeSelector(): React.ReactNode {
-        const {room} = this.props;
-        const [r, g, b] = room.state.memberState.strokeColor;
+        const {roomState, room} = this.props;
+        const [r, g, b] = roomState.memberState.strokeColor;
         return [
             <div key="title" className="palette-title-two">{projectStore.isEnglish() ? "Width" : "宽度"}</div>,
             <div key="box" className="palette-stroke-width-box">
@@ -143,9 +143,9 @@ class ToolBoxPaletteBox extends React.Component<ToolBoxPaletteBoxProps, ToolBoxP
                            min={2}
                            max={32}
                            onChange={this.setStrokeWidth.bind(this)}
-                           defaultValue={`${room.state.memberState.strokeWidth}`}
+                           defaultValue={`${roomState.memberState.strokeWidth}`}
                            onMouseUp={
-                               () => room.setMemberState({strokeWidth: room.state.memberState.strokeWidth})
+                               () => room.setMemberState({strokeWidth: roomState.memberState.strokeWidth})
                            }/>
                 </div>
             </div>,

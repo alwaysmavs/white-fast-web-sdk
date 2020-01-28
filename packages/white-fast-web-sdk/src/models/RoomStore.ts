@@ -21,6 +21,8 @@ export class RoomStore {
     @observable
     public isRecording: boolean = false;
     @observable
+    public isRtcOpen: boolean = false;
+    @observable
     public isScreenZoomLock: boolean = false;
     @observable
     public isInputH5Visible: boolean = false;

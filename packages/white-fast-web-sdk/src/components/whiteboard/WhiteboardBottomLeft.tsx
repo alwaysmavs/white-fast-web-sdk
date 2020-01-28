@@ -55,8 +55,8 @@ class WhiteboardBottomLeft extends React.Component<WhiteboardBottomLeftProps, {}
         }
     }
     private isHavePpt = (): boolean => {
-        const {room} = this.props;
-        return !!(room.state.globalState && room.state.globalState.h5PptUrl);
+        const {roomState} = this.props;
+        return !!(roomState.globalState && roomState.globalState.h5PptUrl);
     }
 
     private handlePptClick = (): void => {
@@ -110,7 +110,7 @@ class WhiteboardBottomLeft extends React.Component<WhiteboardBottomLeftProps, {}
             return <div className="whiteboard-box-bottom-left">
                 <div className="whiteboard-box-mid">
                     <ScaleController
-                        zoomScale={roomState.zoomScale}
+                        roomState={roomState}
                         isReadOnly={this.props.isReadOnly}
                         deviceType={this.props.deviceType}
                         zoomChange={this.zoomChange}/>
@@ -128,7 +128,7 @@ class WhiteboardBottomLeft extends React.Component<WhiteboardBottomLeftProps, {}
                     </Popover>} */}
                     {this.renderFileIcon()}
                     <ScaleController
-                        zoomScale={roomState.zoomScale}
+                        roomState={roomState}
                         deviceType={this.props.deviceType}
                         zoomChange={this.zoomChange}/>
                 </div>

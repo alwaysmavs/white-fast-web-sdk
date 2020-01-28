@@ -1,7 +1,7 @@
 import * as React from "react";
 import {Badge, Tabs, Icon} from "antd";
 import "./WhiteboardManager.less";
-import {Room, ViewMode} from "white-web-sdk";
+import {Room, ViewMode, RoomState} from "white-web-sdk";
 import {GuestUserType, HostUserType} from "../../pages/RoomManager";
 import speak from "../../assets/image/speak.svg";
 import user_empty from "../../assets/image/user_empty.svg";
@@ -30,6 +30,7 @@ export type WhiteboardManagerProps = {
     userAvatarUrl?: string;
     rtc?: RtcType;
     elementId: string;
+    roomState: RoomState;
 };
 
 export type WhiteboardManagerStates = {
@@ -74,13 +75,14 @@ class WhiteboardManager extends React.Component<WhiteboardManagerProps, Whiteboa
     }
 
     private renderHost = (): React.ReactNode => {
-        const {room, userId} = this.props;
-        const hostInfo: HostUserType = room.state.globalState.hostInfo;
+        const {room, userId, roomState} = this.props;
+        const hostInfo: HostUserType = roomState.globalState.hostInfo;
         if (hostInfo) {
             if (userId === hostInfo.userId) {
                 return (
                     <ClassroomMedia isVideoEnable={hostInfo.isVideoEnable}
                                     applyForRtc={false}
+                                    roomState={roomState}
                                     isAllMemberAudioClose={hostInfo.isAllMemberAudioClose}
                                     rtc={this.props.rtc}
                                     isAllowHandUp={hostInfo.isAllowHandUp}
@@ -92,12 +94,13 @@ class WhiteboardManager extends React.Component<WhiteboardManagerProps, Whiteboa
                                     channelId={this.props.uuid}/>
                 );
             } else {
-                const thisGuestUsers = room.state.globalState.guestUsers;
+                const thisGuestUsers = roomState.globalState.guestUsers;
                 if (thisGuestUsers) {
                     const selfInfo: GuestUserType = thisGuestUsers.find((guestUser: GuestUserType) => guestUser.userId === userId);
                     if (selfInfo) {
                         return (
                             <ClassroomMedia isVideoEnable={hostInfo.isVideoEnable}
+                                            roomState={roomState}
                                             applyForRtc={selfInfo.applyForRtc}
                                             isAllowHandUp={hostInfo.isAllowHandUp}
                                             isAllMemberAudioClose={hostInfo.isAllMemberAudioClose}
@@ -113,6 +116,7 @@ class WhiteboardManager extends React.Component<WhiteboardManagerProps, Whiteboa
                         return (
                             <ClassroomMedia isVideoEnable={hostInfo.isVideoEnable}
                                             applyForRtc={false}
+                                            roomState={roomState}
                                             isAllMemberAudioClose={hostInfo.isAllMemberAudioClose}
                                             rtc={this.props.rtc}
                                             isAllowHandUp={hostInfo.isAllowHandUp}
@@ -128,6 +132,7 @@ class WhiteboardManager extends React.Component<WhiteboardManagerProps, Whiteboa
                     return (
                         <ClassroomMedia isVideoEnable={hostInfo.isVideoEnable}
                                         applyForRtc={false}
+                                        roomState={roomState}
                                         isAllowHandUp={hostInfo.isAllowHandUp}
                                         isAllMemberAudioClose={hostInfo.isAllMemberAudioClose}
                                         rtc={this.props.rtc}
@@ -146,7 +151,8 @@ class WhiteboardManager extends React.Component<WhiteboardManagerProps, Whiteboa
     }
 
     private handleAgree = (room: Room, guestUser: GuestUserType, guestUsers: GuestUserType[]): void => {
-        const hostInfo: HostUserType = room.state.globalState.hostInfo;
+        const {roomState} = this.props;
+        const hostInfo: HostUserType = roomState.globalState.hostInfo;
         if (this.props.identity === IdentityType.host) {
             if (hostInfo && guestUsers) {
                 if (hostInfo.isVideoEnable) {
@@ -207,8 +213,8 @@ class WhiteboardManager extends React.Component<WhiteboardManagerProps, Whiteboa
         }
     }
     private renderGuestIcon = (guestUser: GuestUserType, guestUsers: GuestUserType[]): React.ReactNode => {
-        const {room} = this.props;
-        const hostInfo: HostUserType = room.state.globalState.hostInfo;
+        const {room, roomState} = this.props;
+        const hostInfo: HostUserType = roomState.globalState.hostInfo;
         const isHost = this.props.identity === IdentityType.host;
         if (hostInfo && hostInfo.classMode === ClassModeType.lecture) {
             if (guestUser.isHandUp) {
@@ -264,8 +270,8 @@ class WhiteboardManager extends React.Component<WhiteboardManagerProps, Whiteboa
         }
     }
     private renderGuest = (): React.ReactNode => {
-        const {room} = this.props;
-        const globalGuestUsers: GuestUserType[] = room.state.globalState.guestUsers;
+        const {room, roomState} = this.props;
+        const globalGuestUsers: GuestUserType[] = roomState.globalState.guestUsers;
         if (globalGuestUsers && globalGuestUsers.length > 0) {
             const guestNodesOnline = globalGuestUsers.filter(guestUser => guestUser.isOnline);
             const guestNodes = guestNodesOnline.map((guestUser: GuestUserType, index: number) => {
@@ -313,7 +319,7 @@ class WhiteboardManager extends React.Component<WhiteboardManagerProps, Whiteboa
     private handleDotState = (): React.ReactNode => {
         const isActive = this.state.activeKey === "2";
         if (this.props.isManagerOpen && !isActive) {
-            const guestUsers: GuestUserType[] = this.props.room.state.globalState.guestUsers;
+            const guestUsers: GuestUserType[] = this.props.roomState.globalState.guestUsers;
             if (guestUsers && guestUsers.length > 0) {
                 const handUpGuestUsers = guestUsers.filter((guestUser: GuestUserType) => guestUser.isHandUp);
                 if (handUpGuestUsers && handUpGuestUsers.length > 0) {
@@ -364,18 +370,18 @@ class WhiteboardManager extends React.Component<WhiteboardManagerProps, Whiteboa
         }
     }
     private setMediaAudioState = (state: boolean): void => {
-        const {room, identity} = this.props;
+        const {room, identity, roomState} = this.props;
         if (identity === IdentityType.host) {
             room.setGlobalState({hostInfo: {
-                    ...room.state.globalState.hostInfo,
+                    ...roomState.globalState.hostInfo,
                     isAllMemberAudioClose: state,
                 }});
         }
     }
     private getMediaState = (): boolean => {
-        const {room} = this.props;
-        if (room.state.globalState.hostInfo) {
-            const hostInfo: HostUserType = room.state.globalState.hostInfo;
+        const {roomState} = this.props;
+        if (roomState.globalState.hostInfo) {
+            const hostInfo: HostUserType = roomState.globalState.hostInfo;
             if (hostInfo) {
                 return hostInfo.isVideoEnable;
             } else {
@@ -390,8 +396,8 @@ class WhiteboardManager extends React.Component<WhiteboardManagerProps, Whiteboa
             return null;
         }
         if (this.props.identity === IdentityType.host) {
-            const {room} = this.props;
-            const hostInfo: HostUserType = room.state.globalState.hostInfo;
+            const {roomState} = this.props;
+            const hostInfo: HostUserType = roomState.globalState.hostInfo;
             if (hostInfo) {
                 if (hostInfo.isAllMemberAudioClose) {
                     return (

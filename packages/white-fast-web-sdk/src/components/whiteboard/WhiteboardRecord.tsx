@@ -5,7 +5,7 @@ import {displayWatch} from "../../tools/WatchDisplayer";
 import {RecordOperator} from "./RecordOperator";
 import {OSSConfigObjType} from "../../appToken";
 import {HostUserType} from "../../pages/RoomManager";
-import {Room} from "white-web-sdk";
+import {Room, RoomState} from "white-web-sdk";
 import video_record from "../../assets/image/video_record.svg";
 import whiteboard_record from "../../assets/image/whiteboard_record.svg";
 import player_green from "../../assets/image/player_green.svg";
@@ -27,6 +27,7 @@ export type WhiteboardRecordProps = {
     channelName: string;
     uuid: string;
     ossConfigObj: OSSConfigObjType;
+    roomState: RoomState;
     rtc?: RtcType;
     room: Room;
     replayCallback?: () => void;
@@ -67,9 +68,9 @@ class WhiteboardRecord extends React.Component<WhiteboardRecordProps, Whiteboard
         }
     }
     private getMediaState = (): boolean => {
-        const {room} = this.props;
-        if (room.state.globalState.hostInfo) {
-            const hostInfo: HostUserType = room.state.globalState.hostInfo;
+        const {roomState} = this.props;
+        if (roomState.globalState.hostInfo) {
+            const hostInfo: HostUserType = roomState.globalState.hostInfo;
             if (hostInfo) {
                 return hostInfo.isVideoEnable;
             } else {
@@ -284,15 +285,15 @@ class WhiteboardRecord extends React.Component<WhiteboardRecordProps, Whiteboard
         this.stopClock();
     }
     private setRecordState = (state: boolean): void => {
-        const {room} = this.props;
+        const {room, roomState} = this.props;
         if (state) {
             room.setGlobalState({hostInfo: {
-                    ...room.state.globalState.hostInfo,
+                    ...roomState.globalState.hostInfo,
                     isRecording: state,
                 }});
         } else {
             room.setGlobalState({hostInfo: {
-                    ...room.state.globalState.hostInfo,
+                    ...roomState.globalState.hostInfo,
                     isRecording: state,
                     secondsElapsed: undefined,
                 }});

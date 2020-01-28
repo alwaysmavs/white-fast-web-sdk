@@ -2,7 +2,7 @@ import * as React from "react";
 import close from "../../assets/image/close.svg";
 import add_icon from "../../assets/image/add_icon.svg";
 import TweenOne from "rc-tween-one";
-import {Room, Scene} from "white-web-sdk";
+import {Room, Scene, RoomState} from "white-web-sdk";
 import "./MenuAnnexBox.less";
 import VirtualList, {ItemInfo} from "react-tiny-virtual-list";
 import {LanguageEnum} from "../../pages/NetlessRoomTypes";
@@ -16,6 +16,7 @@ export type MenuAnnexBoxState = {
 
 export type MenuAnnexBoxProps = {
     room: Room;
+    roomState: RoomState;
     handleAnnexBoxMenuState: () => void;
     isPreviewMenuOpen: boolean;
 };
@@ -38,8 +39,8 @@ class MenuAnnexBox extends React.Component<MenuAnnexBoxProps, MenuAnnexBoxState>
     }
 
     private removeScene(): void {
-        const {room} = this.props;
-        const scenePath = room.state.sceneState.scenePath;
+        const {room, roomState} = this.props;
+        const scenePath = roomState.sceneState.scenePath;
         room.removeScenes(`${scenePath}`);
     }
     private setScenePath = (newActiveIndex: number) => {
@@ -88,11 +89,11 @@ class MenuAnnexBox extends React.Component<MenuAnnexBoxProps, MenuAnnexBoxState>
     }
 
     public render(): React.ReactNode {
-        const {room} = this.props;
-        const scenes = this.props.room.state.sceneState.scenes;
-        const sceneDir = room.state.sceneState.scenePath.split("/");
+        const {roomState} = this.props;
+        const scenes = roomState.sceneState.scenes;
+        const sceneDir = roomState.sceneState.scenePath.split("/");
         sceneDir.pop();
-        const activeIndex = room.state.sceneState.index;
+        const activeIndex = roomState.sceneState.index;
         return (
             <div
                 ref={ref => this.ref = ref} className="menu-annex-box">
@@ -147,9 +148,9 @@ class MenuAnnexBox extends React.Component<MenuAnnexBoxProps, MenuAnnexBoxState>
                         className="menu-under-btn-inner"
                         onClick={() => {
                             const {room} = this.props;
-                            const activeIndex = room.state.sceneState.index;
+                            const activeIndex = roomState.sceneState.index;
                             const newSceneIndex = activeIndex + 1;
-                            const scenePath = room.state.sceneState.scenePath;
+                            const scenePath = roomState.sceneState.scenePath;
                             const pathName = this.pathName(scenePath);
                             room.putScenes(`/${pathName}`, [{}], newSceneIndex);
                             room.setSceneIndex(newSceneIndex);

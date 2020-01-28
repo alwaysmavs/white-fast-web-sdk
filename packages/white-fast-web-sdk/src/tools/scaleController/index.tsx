@@ -1,7 +1,7 @@
 import * as React from "react";
 import TweenOne from "rc-tween-one";
 import "./styles.less";
-import {DeviceType} from "white-web-sdk";
+import {DeviceType, RoomState} from "white-web-sdk";
 export type ScaleControllerState = {
   scaleAnimation: boolean;
   reverseState: boolean;
@@ -9,7 +9,7 @@ export type ScaleControllerState = {
 };
 
 export type ScaleControllerProps = {
-  zoomScale: number;
+  roomState: RoomState;
   zoomChange: (scale: number) => void;
   deviceType: DeviceType;
   isReadOnly?: boolean;
@@ -118,7 +118,7 @@ export default class ScaleController extends React.Component<ScaleControllerProp
   private moveRuleIndex(deltaIndex: number): void {
 
     if (this.tempRuleIndex === undefined) {
-      this.tempRuleIndex = ScaleController.readRuleIndexByScale(this.props.zoomScale);
+      this.tempRuleIndex = ScaleController.readRuleIndexByScale(this.props.roomState.zoomScale);
     }
     this.tempRuleIndex += deltaIndex;
 
@@ -140,7 +140,7 @@ export default class ScaleController extends React.Component<ScaleControllerProp
         return (
             <div className="scale-controller-box">
                 <div className="scale-controller-num">
-                    {Math.ceil(this.props.zoomScale * 100)} %
+                    {Math.ceil(this.props.roomState.zoomScale * 100)} %
                 </div>
             </div>
         );
@@ -180,7 +180,7 @@ export default class ScaleController extends React.Component<ScaleControllerProp
                 className="scale-controller-box">
                 <div className="scale-controller-num"
                      onClick={() => this.moveTo100()}>
-                    {Math.ceil(this.props.zoomScale * 100)} %
+                    {Math.ceil(this.props.roomState.zoomScale * 100)} %
                 </div>
                 <TweenOne animation={{
                     delay: 150,

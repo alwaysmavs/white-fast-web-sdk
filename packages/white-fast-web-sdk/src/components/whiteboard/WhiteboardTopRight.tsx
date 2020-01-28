@@ -11,7 +11,7 @@ import * as add from "../../assets/image/add.svg";
 import {GuestUserType} from "../../pages/RoomManager";
 import "./WhiteboardTopRight.less";
 import Identicon from "@netless/identicon";
-import {IdentityType, LanguageEnum} from "../../pages/NetlessRoomTypes";
+import {IdentityType} from "../../pages/NetlessRoomTypes";
 import {roomStore} from "../../models/RoomStore";
 import { observer } from "mobx-react";
 import { projectStore } from "../../models/ProjectStore";
@@ -29,6 +29,7 @@ export type WhiteboardTopRightProps = {
     isManagerOpen: boolean | null;
     exitRoomCallback?: () => void;
     replayCallback?: () => void;
+    roomState: RoomState;
 };
 
 export enum ShareUrlType {
@@ -70,7 +71,7 @@ class WhiteboardTopRight extends React.Component<WhiteboardTopRightProps, Whiteb
 
     private handleDotState = (): boolean => {
         if (!this.props.isManagerOpen) {
-            const guestUsers: GuestUserType[] = this.props.room.state.globalState.guestUsers;
+            const guestUsers: GuestUserType[] = this.props.roomState.globalState.guestUsers;
             if (guestUsers && guestUsers.length > 0) {
                 const handUpGuestUsers = guestUsers.filter((guestUser: GuestUserType) => guestUser.isHandUp);
                 return handUpGuestUsers && handUpGuestUsers.length > 0;

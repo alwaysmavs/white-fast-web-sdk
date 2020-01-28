@@ -100,9 +100,9 @@ export default class ToolBox extends React.Component<ToolBoxProps, ToolBoxStates
     }
 
     public clickAppliance = (event: Event | undefined, applianceName: string): void => {
-        const {room} = this.props;
+        const {room, roomState} = this.props;
         event!.preventDefault();
-        const isSelected = room.state.memberState.currentApplianceName === applianceName;
+        const isSelected = roomState.memberState.currentApplianceName === applianceName;
         if (isSelected) {
             this.setState({isToolBoxSwitched: false, extendsPanel: !this.state.extendsPanel});
         } else {
@@ -122,9 +122,9 @@ export default class ToolBox extends React.Component<ToolBoxProps, ToolBoxStates
     }
 
     private buttonColor(isSelected: boolean): string {
-        const {room} = this.props;
+        const {roomState} = this.props;
         if (isSelected) {
-            const [r, g, b] = room.state.memberState.strokeColor;
+            const [r, g, b] = roomState.memberState.strokeColor;
             return `rgb(${r},${g},${b})`;
         } else {
             return "rgb(162,167,173)";
@@ -155,8 +155,8 @@ export default class ToolBox extends React.Component<ToolBoxProps, ToolBoxStates
     }
 
     private isHavePpt = (): boolean => {
-        const {room} = this.props;
-        const isHave = !!(room.state.globalState && room.state.globalState.h5PptUrl);
+        const {roomState} = this.props;
+        const isHave = !!(roomState.globalState && roomState.globalState.h5PptUrl);
         if (isHave) {
             roomStore.isScreenZoomLock = true;
         }
@@ -240,10 +240,10 @@ export default class ToolBox extends React.Component<ToolBoxProps, ToolBoxStates
     }
 
     private renderApplianceButton(applianceName: string, description: ApplianceDescription): React.ReactNode {
-        const {toolBarPosition, room} = this.props;
+        const {toolBarPosition, roomState} = this.props;
         const ToolIcon = description.iconView;
         const isExtendable = description.hasStroke || description.hasColor;
-        const isSelected = room.state.memberState.currentApplianceName === applianceName;
+        const isSelected = roomState.memberState.currentApplianceName === applianceName;
         const buttonColor = this.buttonColor(isSelected);
 
         const cellBox: React.ReactNode = (

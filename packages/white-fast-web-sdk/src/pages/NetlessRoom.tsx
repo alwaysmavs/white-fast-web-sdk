@@ -153,7 +153,7 @@ class NetlessRoom extends React.Component<NetlessRoomProps, NetlessRoomStates> i
                         console.error("kicked with reason: " + reason);
                     },
                     onRoomStateChanged: modifyState => {
-                        this.setState({roomState: modifyState as RoomState});
+                        this.setState({roomState: {...room.state, modifyState} as RoomState});
                         if (modifyState.roomMembers) {
                             cursor.setColorAndAppliance(modifyState.roomMembers);
                         }
@@ -354,10 +354,11 @@ class NetlessRoom extends React.Component<NetlessRoomProps, NetlessRoomStates> i
             menuInnerState: MenuInnerType.AnnexBox,
         });
     }
-    private renderMenuInner = (): React.ReactNode => {
+    private renderMenuInner = (roomState: RoomState): React.ReactNode => {
         switch (this.state.menuInnerState) {
             case MenuInnerType.AnnexBox:
                 return <MenuAnnexBox
+                    roomState={roomState}
                     isPreviewMenuOpen={this.state.isPreviewMenuOpen}
                     room={this.state.room!}
                     handleAnnexBoxMenuState={this.handleAnnexBoxMenuState}/>;
@@ -468,9 +469,9 @@ class NetlessRoom extends React.Component<NetlessRoomProps, NetlessRoomStates> i
         this.setState({isFileOpen: !this.state.isFileOpen});
     }
 
-    private detectIsReadOnly = (): boolean => {
+    private detectIsReadOnly = (roomState: RoomState, room: Room): boolean => {
         const {identity, userId, isManagerOpen} = this.props;
-        const {room} = this.state;
+        // const {room} = this.state;
         if (isManagerOpen === null) {
             return false;
         }
@@ -479,30 +480,27 @@ class NetlessRoom extends React.Component<NetlessRoomProps, NetlessRoomStates> i
         } else if (identity === IdentityType.host) {
             return false;
         }
-        if (room) {
-            const selfUser: GuestUserType = room.state.globalState.guestUsers.find((user: GuestUserType) => user.userId === userId);
-            if (selfUser) {
-                room.disableDeviceInputs = selfUser.isReadOnly;
-                return selfUser.isReadOnly;
-            } else {
-                if (this.props.isReadOnly) {
-                    room.disableDeviceInputs = this.props.isReadOnly;
-                    return this.props.isReadOnly;
-                } else {
-                    return true;
-                }
-            }
+        const selfUser: GuestUserType = roomState.globalState.guestUsers.find((user: GuestUserType) => user.userId === userId);
+        if (selfUser) {
+            room.disableDeviceInputs = selfUser.isReadOnly;
+            return selfUser.isReadOnly;
         } else {
-            return true;
+            if (this.props.isReadOnly) {
+                room.disableDeviceInputs = this.props.isReadOnly;
+                return this.props.isReadOnly;
+            } else {
+                return true;
+            }
         }
     }
-    private renderRecordComponent = (): React.ReactNode => {
+    private renderRecordComponent = (roomState: RoomState): React.ReactNode => {
         if (this.props.enableRecord === false) {
           return null;
         }
         if (this.props.identity === IdentityType.host && this.state.deviceType !== DeviceType.Touch) {
             return (
                 <WhiteboardRecord
+                    roomState={roomState}
                     ossConfigObj={this.state.ossConfigObj}
                     replayCallback={this.props.replayCallback}
                     room={this.state.room!}
@@ -557,20 +555,20 @@ class NetlessRoom extends React.Component<NetlessRoomProps, NetlessRoomStates> i
         this.setState({documentArray: state});
     }
 
-    private getCameraState = (room: Room): ViewMode => {
+    private getCameraState = (roomState: RoomState): ViewMode => {
         const {userId} = this.props;
         if (this.props.isManagerOpen === null) {
             return ViewMode.Freedom;
         } else {
             if (this.props.identity === IdentityType.host) {
-                const userSelf: HostUserType = room.state.globalState.hostInfo;
+                const userSelf: HostUserType = roomState.globalState.hostInfo;
                 if (userSelf) {
                     return userSelf.cameraState;
                 } else {
                     return ViewMode.Freedom;
                 }
             } else if (this.props.identity === IdentityType.guest) {
-                const userSelf: GuestUserType = room.state.globalState.guestUsers.find((user: GuestUserType) => user.userId === userId);
+                const userSelf: GuestUserType = roomState.globalState.guestUsers.find((user: GuestUserType) => user.userId === userId);
                 if (userSelf) {
                     return userSelf.cameraState;
                 } else {
@@ -582,20 +580,20 @@ class NetlessRoom extends React.Component<NetlessRoomProps, NetlessRoomStates> i
         }
     }
 
-    private getDisableCameraTransformState = (room: Room): boolean => {
+    private getDisableCameraTransformState = (roomState: RoomState): boolean => {
         const {userId} = this.props;
         if (this.props.isManagerOpen === null) {
             return false;
         } else {
             if (this.props.identity === IdentityType.host) {
-                const userSelf: HostUserType = room.state.globalState.hostInfo;
+                const userSelf: HostUserType = roomState.globalState.hostInfo;
                 if (userSelf) {
                     return userSelf.disableCameraTransform;
                 } else {
                     return true;
                 }
             } else if (this.props.identity === IdentityType.guest) {
-                const userSelf: GuestUserType = room.state.globalState.guestUsers.find((user: GuestUserType) => user.userId === userId);
+                const userSelf: GuestUserType = roomState.globalState.guestUsers.find((user: GuestUserType) => user.userId === userId);
                 if (userSelf) {
                     return userSelf.disableCameraTransform;
                 } else {
@@ -613,7 +611,6 @@ class NetlessRoom extends React.Component<NetlessRoomProps, NetlessRoomStates> i
     public render(): React.ReactNode {
         const {phase, connectedFail, room, roomState} = this.state;
         const {loadingSvgUrl} = this.props;
-        const isReadOnly = this.detectIsReadOnly();
         if (connectedFail || phase === RoomPhase.Disconnected) {
             return <PageError/>;
         } else if (phase === RoomPhase.Reconnecting) {
@@ -634,8 +631,9 @@ class NetlessRoom extends React.Component<NetlessRoomProps, NetlessRoomStates> i
                         phase={phase}
                         loadingSvgUrl={loadingSvgUrl}/>;
         } else {
-            const cameraState = this.getCameraState(room);
-            const disableCameraTransform = this.getDisableCameraTransformState(room);
+            const isReadOnly = this.detectIsReadOnly(roomState, room);
+            const cameraState = this.getCameraState(roomState);
+            const disableCameraTransform = this.getDisableCameraTransformState(roomState);
             this.handleScreenLock(room);
             return (
                 <RoomContextProvider value={{
@@ -651,7 +649,7 @@ class NetlessRoom extends React.Component<NetlessRoomProps, NetlessRoomStates> i
                             setMenuState={this.setPreviewMenuState}
                             isVisible={this.state.isMenuVisible}
                         >
-                            {this.renderMenuInner()}
+                            {this.renderMenuInner(roomState)}
                         </MenuBox>
                         <MenuBox
                             pagePreviewPosition={PagePreviewPositionEnum.left}
@@ -660,6 +658,7 @@ class NetlessRoom extends React.Component<NetlessRoomProps, NetlessRoomStates> i
                             isVisible={this.state.isFileOpen}
                         >
                             <WhiteboardFile
+                                roomState={roomState}
                                 handleFileState={this.handleFileState}
                                 isFileMenuOpen={this.state.isFileMenuOpen}
                                 handleDocumentArrayState={this.handleDocumentArrayState}
@@ -681,6 +680,7 @@ class NetlessRoom extends React.Component<NetlessRoomProps, NetlessRoomStates> i
                                 roomName={this.props.roomName}
                                 logoUrl={this.props.logoUrl}/>
                             <WhiteboardTopRight
+                                roomState={roomState}
                                 isManagerOpen={this.state.isManagerOpen}
                                 exitRoomCallback={this.props.exitRoomCallback}
                                 handleManagerState={this.handleManagerState}
@@ -709,7 +709,7 @@ class NetlessRoom extends React.Component<NetlessRoomProps, NetlessRoomStates> i
                                 handleChatState={this.handleChatState}
                                 handleAnnexBoxMenuState={this.handleAnnexBoxMenuState}
                                 room={room}/>
-                            {this.renderRecordComponent()}
+                            {this.renderRecordComponent(roomState)}
                             <ToolBox
                                 room={room}
                                 roomState={roomState}
@@ -740,10 +740,11 @@ class NetlessRoom extends React.Component<NetlessRoomProps, NetlessRoomStates> i
                                 ref={this.setWhiteboardLayerDownRef}>
                                 <RoomWhiteboard room={room} style={{width: "100%", height: "100%"}}/>
                             </div>
-                            <WebPpt identity={this.props.identity} ppt={room.state.globalState.ppt} room={room}/>
+                            <WebPpt roomState={roomState} identity={this.props.identity} ppt={room.state.globalState.ppt} room={room}/>
                         </Dropzone>
                         {!isMobile &&
                         <WhiteboardManager
+                            roomState={roomState}
                             elementId={this.props.elementId}
                             uuid={this.props.uuid}
                             userAvatarUrl={this.props.userAvatarUrl}

@@ -1,6 +1,6 @@
 import * as React from "react";
 import "./WhiteboardFile.less";
-import {Room} from "white-web-sdk";
+import {Room, RoomState} from "white-web-sdk";
 import * as default_cover_home from "../../assets/image/default_cover_home.svg";
 import * as close from "../../assets/image/close.svg";
 import {PPTDataType, PPTType} from "../menu/PPTDatas";
@@ -13,6 +13,7 @@ export type WhiteboardFileProps = {
     isFileOpen?: boolean;
     isFileMenuOpen: boolean;
     uuid: string;
+    roomState: RoomState;
     documentArray: PPTDataType[];
     handleDocumentArrayState: (state: PPTDataType[]) => void;
 };
@@ -42,10 +43,10 @@ class WhiteboardFile extends React.Component<WhiteboardFileProps, {}> {
     }
 
     private handleUpdateDocsState = (id: string, documentArray: PPTDataType[]): void => {
-        const {room, uuid} = this.props;
+        const {room, uuid, roomState} = this.props;
         const activeData = documentArray.find(data => data.id === id)!;
-        if (room.state.globalState.documentArrayState) {
-            const documentArrayState: {id: string, isHaveScenes: boolean}[] = room.state.globalState.documentArrayState;
+        if (roomState.globalState.documentArrayState) {
+            const documentArrayState: {id: string, isHaveScenes: boolean}[] = roomState.globalState.documentArrayState;
             const activeDoc = documentArrayState.find(doc => doc.id === id);
             if (activeDoc) {
                 if (activeDoc.isHaveScenes) {
