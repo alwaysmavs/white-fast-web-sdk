@@ -88,6 +88,9 @@ class MenuAnnexBox extends React.Component<MenuAnnexBoxProps, MenuAnnexBoxState>
         }
     }
 
+    private setRef(ref: HTMLDivElement | null): void {
+        this.ref = ref;
+    }
     public render(): React.ReactNode {
         const {roomState} = this.props;
         const scenes = roomState.sceneState.scenes;
@@ -96,7 +99,7 @@ class MenuAnnexBox extends React.Component<MenuAnnexBoxProps, MenuAnnexBoxState>
         const activeIndex = roomState.sceneState.index;
         return (
             <div
-                ref={ref => this.ref = ref} className="menu-annex-box">
+                ref={this.setRef.bind(this)} className="menu-annex-box">
                 <div className="menu-title-line">
                     <div className="menu-title-text-box">
                         {projectStore.isEnglish() ? "Preview" : "预览"}
@@ -190,7 +193,7 @@ class PageImage extends React.Component<PageImageProps, {}> {
     }
 
     public render(): React.ReactNode {
-        return <div className="ppt-image" ref={this.setupDivRef}/>;
+        return <div className="ppt-image" ref={this.setupDivRef.bind(this)}/>;
     }
 }
 

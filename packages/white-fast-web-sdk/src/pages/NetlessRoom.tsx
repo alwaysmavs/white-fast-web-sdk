@@ -367,7 +367,7 @@ class NetlessRoom extends React.Component<NetlessRoomProps, NetlessRoomStates> i
         }
     }
 
-    private setWhiteboardLayerDownRef = (whiteboardLayerDownRef: HTMLDivElement): void => {
+    private setWhiteboardLayerDownRef(whiteboardLayerDownRef: HTMLDivElement): void {
         this.setState({whiteboardLayerDownRef: whiteboardLayerDownRef});
     }
 
@@ -643,7 +643,7 @@ class NetlessRoom extends React.Component<NetlessRoomProps, NetlessRoomStates> i
                 }}>
                     <div className="realtime-box">
                         <MenuBox
-                            onRef={this.onRef}
+                            onRef={this.onRef.bind(this)}
                             isSidePreview={this.state.menuInnerState === MenuInnerType.AnnexBox}
                             pagePreviewPosition={this.props.pagePreviewPosition}
                             setMenuState={this.setPreviewMenuState}
@@ -737,7 +737,7 @@ class NetlessRoom extends React.Component<NetlessRoomProps, NetlessRoomStates> i
                             <div
                                 style={{pointerEvents: roomStore.boardPointerEvents}}
                                 className="whiteboard-tool-layer-down"
-                                ref={this.setWhiteboardLayerDownRef}>
+                                ref={this.setWhiteboardLayerDownRef.bind(this)}>
                                 <RoomWhiteboard room={room} style={{width: "100%", height: "100%"}}/>
                             </div>
                             <WebPpt roomState={roomState} identity={this.props.identity} ppt={room.state.globalState.ppt} room={room}/>

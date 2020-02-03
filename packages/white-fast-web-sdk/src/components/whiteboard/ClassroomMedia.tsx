@@ -578,6 +578,10 @@ class ClassroomMedia extends React.Component<ClassroomMediaProps, ClassroomMedia
         }
     }
 
+    private setUpCassroomMediaManagerRef (ref: any): void {
+        this.classroomMediaManager = ref;
+    }
+
     public render(): React.ReactNode {
         const {roomState} = this.props;
         const hostInfo: HostUserType = roomState.globalState.hostInfo;
@@ -656,7 +660,7 @@ class ClassroomMedia extends React.Component<ClassroomMediaProps, ClassroomMedia
                        </div>
                    </div>}
                    <ClassroomMediaManager
-                        ref={(classroomMediaManager: ClassroomMediaManager) => this.classroomMediaManager = classroomMediaManager}
+                        ref={this.setUpCassroomMediaManagerRef.bind(this)}
                         rtcType={this.props.rtc!.type as RtcEnum}
                         rtcClient={this.agoraClient}
                         isLocalStreamPublish={this.state.isLocalStreamPublish}

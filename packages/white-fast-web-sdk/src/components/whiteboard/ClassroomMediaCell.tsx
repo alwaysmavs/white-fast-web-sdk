@@ -155,13 +155,16 @@ export default class ClassroomMediaCell extends React.Component<ClassroomManager
     private zegoSDKDetect = () => this.props.rtcType === "zego";
     private agoraSDKDetect = () => this.props.rtcType === "agora";
 
+    private setUpVideoRef (ref: HTMLVideoElement): void {
+        this.videoEl = ref;
+    }
     public render(): React.ReactNode {
         const {stream, rtcType, isLocalStreamPublish} = this.props;
         const isZegoSDK = this.zegoSDKDetect();
         const isAgoraSDK = this.agoraSDKDetect();
 
         const zegoVideoNode = <video
-            ref={(videoEl: HTMLVideoElement) => this.videoEl = videoEl}
+            ref={this.setUpVideoRef.bind(this)}
             autoPlay
             playsInline
             onClick={() => this.handleClickVideo(streamId)}
