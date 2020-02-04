@@ -191,7 +191,8 @@ class ClassroomMedia extends React.Component<ClassroomMediaProps, ClassroomMedia
         }
 
         if (this.props.applyForRtc !== nextProps.applyForRtc) {
-            const hostInfo: HostUserType = this.props.roomState.globalState.hostInfo;
+            const {roomState} = this.props;
+            const hostInfo: HostUserType = (roomState.globalState as any).hostInfo;
             if (hostInfo.classMode === ClassModeType.lecture && nextProps.applyForRtc && nextProps.isVideoEnable) {
                 const {rtc, userId} = this.props;
                 const {localStream} = this.state;
@@ -249,8 +250,8 @@ class ClassroomMedia extends React.Component<ClassroomMediaProps, ClassroomMedia
 
     private handleHandup = (classMode: ClassModeType, room: Room, userId?: string): void => {
         const {roomState} = this.props;
-        const globalGuestUsers: GuestUserType[] = roomState.globalState.guestUsers;
-        const selfHostInfo: HostUserType = roomState.globalState.hostInfo;
+        const globalGuestUsers: GuestUserType[] = (roomState.globalState as any).guestUsers;
+        const selfHostInfo: HostUserType = (roomState.globalState as any).hostInfo;
         if (userId) {
             if (classMode === ClassModeType.lecture && globalGuestUsers) {
                 const users = globalGuestUsers.map((user: GuestUserType) => {
@@ -290,7 +291,7 @@ class ClassroomMedia extends React.Component<ClassroomMediaProps, ClassroomMedia
 
     private renderHostController = (hostInfo: HostUserType): React.ReactNode => {
         const {room, roomState} = this.props;
-        const guestUsers: GuestUserType[] = roomState.globalState.guestUsers;
+        const guestUsers: GuestUserType[] = (roomState.globalState as any).guestUsers;
         if (hostInfo.classMode) {
             if (this.props.identity === IdentityType.host) {
                 return (
@@ -377,7 +378,7 @@ class ClassroomMedia extends React.Component<ClassroomMediaProps, ClassroomMedia
 
     private renderRtcBtn = (): React.ReactNode => {
         const {rtc, roomState, identity} = this.props;
-        const hostInfo: HostUserType = roomState.globalState.hostInfo;
+        const hostInfo: HostUserType = (roomState.globalState as any).hostInfo;
         if (rtc) {
             if (hostInfo.classMode === ClassModeType.discuss) {
                 if (identity === IdentityType.listener && !hostInfo.isVideoEnable) {
@@ -432,7 +433,7 @@ class ClassroomMedia extends React.Component<ClassroomMediaProps, ClassroomMedia
 
     private renderHost = (): React.ReactNode => {
         const {roomState, handleManagerState} = this.props;
-        const hostInfo: HostUserType = roomState.globalState.hostInfo;
+        const hostInfo: HostUserType = (roomState.globalState as any).hostInfo;
         if (hostInfo) {
             return (
                 <div className="manager-box-inner-host">
@@ -584,7 +585,7 @@ class ClassroomMedia extends React.Component<ClassroomMediaProps, ClassroomMedia
 
     public render(): React.ReactNode {
         const {roomState} = this.props;
-        const hostInfo: HostUserType = roomState.globalState.hostInfo;
+        const hostInfo: HostUserType = (roomState.globalState as any).hostInfo;
         return (
             <div className="netless-video-out-box">
                {!this.state.isRtcStart &&
@@ -680,7 +681,7 @@ class ClassroomMedia extends React.Component<ClassroomMediaProps, ClassroomMedia
         const {room, identity, roomState} = this.props;
         if (identity === IdentityType.host) {
             room.setGlobalState({hostInfo: {
-                    ...roomState.globalState.hostInfo,
+                    ...(roomState.globalState as any).hostInfo,
                     isVideoEnable: state,
                 }});
         }

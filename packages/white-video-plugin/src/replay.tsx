@@ -3,19 +3,21 @@ import { PluginProps } from "white-web-sdk";
 import { reaction, IReactionDisposer } from "mobx";
 import "./index.less";
 import * as video_plugin from "./image/video_plugin.svg";
+import { PluginContext } from "./Plugins";
 export enum IdentityType {
     host = "host",
     guest = "guest",
     listener = "listener",
 }
 
-export type WhiteVideoPluginProps = PluginProps<{
+export type WhiteVideoPluginProps = PluginProps<PluginContext, {
     play: boolean;
     seek: number;
-    volume: number,
-    mute: boolean,
+    volume: number;
+    mute: boolean;
     currentTime: number;
 }>;
+
 
 export type SelfUserInf = {
     identity: IdentityType,
@@ -145,7 +147,7 @@ export default class WhiteVideoPluginReplay extends React.Component<WhiteVideoPl
                         <video webkit-playsinline="true"
                             playsInline
                             className="white-plugin-video"
-                            src={plugin.attributes.pluginVideoUrl}
+                            src={(plugin.attributes as any).pluginVideoUrl}
                             ref={this.player}
                             muted={this.state.mute}
                             style={{

@@ -2,10 +2,9 @@ import * as React from "react";
 import close from "../../assets/image/close.svg";
 import add_icon from "../../assets/image/add_icon.svg";
 import TweenOne from "rc-tween-one";
-import {Room, Scene, RoomState} from "white-web-sdk";
+import {Room, WhiteScene, RoomState} from "white-web-sdk";
 import "./MenuAnnexBox.less";
 import VirtualList, {ItemInfo} from "react-tiny-virtual-list";
-import {LanguageEnum} from "../../pages/NetlessRoomTypes";
 import { observer } from "mobx-react";
 import { projectStore } from "../../models/ProjectStore";
 
@@ -170,7 +169,7 @@ class MenuAnnexBox extends React.Component<MenuAnnexBoxProps, MenuAnnexBoxState>
     }
 }
 
-export type PageImageProps = { scene: Scene, path: string, room: Room, isMenuOpen: boolean};
+export type PageImageProps = { scene: WhiteScene, path: string, room: Room, isMenuOpen: boolean};
 
 class PageImage extends React.Component<PageImageProps, {}> {
 

@@ -69,8 +69,8 @@ class WhiteboardRecord extends React.Component<WhiteboardRecordProps, Whiteboard
     }
     private getMediaState = (): boolean => {
         const {roomState} = this.props;
-        if (roomState.globalState.hostInfo) {
-            const hostInfo: HostUserType = roomState.globalState.hostInfo;
+        if ((roomState.globalState as any).hostInfo) {
+            const hostInfo: HostUserType = (roomState.globalState as any).hostInfo;
             if (hostInfo) {
                 return hostInfo.isVideoEnable;
             } else {
@@ -288,12 +288,12 @@ class WhiteboardRecord extends React.Component<WhiteboardRecordProps, Whiteboard
         const {room, roomState} = this.props;
         if (state) {
             room.setGlobalState({hostInfo: {
-                    ...roomState.globalState.hostInfo,
+                    ...(roomState.globalState as any).hostInfo,
                     isRecording: state,
                 }});
         } else {
             room.setGlobalState({hostInfo: {
-                    ...roomState.globalState.hostInfo,
+                    ...(roomState.globalState as any).hostInfo,
                     isRecording: state,
                     secondsElapsed: undefined,
                 }});

@@ -5,13 +5,15 @@ import {PluginContext} from "./Plugins";
 import WhiteVideoPluginRoom from "./room";
 import WhiteVideoPluginReplay from "./replay";
 
-export type WhiteVideoPluginProps = PluginProps<{
+export type WhiteVideoPluginProps = PluginProps<PluginContext, WhiteVideoPluginAttributes>;
+
+export type WhiteVideoPluginAttributes = {
     play: boolean;
     seek: number;
-    volume: number;
-    mute: boolean;
+    volume: number,
+    mute: boolean,
     currentTime: number;
-}>;
+};
 
 class WhiteVideoPlugin extends React.Component<WhiteVideoPluginProps, {}> {
 
@@ -49,7 +51,7 @@ class WhiteVideoPlugin extends React.Component<WhiteVideoPluginProps, {}> {
     }
 }
 
-export const videoPlugin: Plugin<PluginContext, WhiteVideoPluginProps> = Object.freeze({
+export const videoPlugin: Plugin<PluginContext, WhiteVideoPluginAttributes> = Object.freeze({
     kind: "video",
     render: WhiteVideoPlugin,
     defaultAttributes: {
@@ -59,8 +61,8 @@ export const videoPlugin: Plugin<PluginContext, WhiteVideoPluginProps> = Object.
         volume: 1,
         currentTime: 0,
     },
-    hitTest: (plugin: PluginInstance<PluginContext, WhiteVideoPluginProps>): boolean => {
-        const memberState = plugin.component.context.getMemberState();
+    hitTest: (plugin: PluginInstance<PluginContext, WhiteVideoPluginAttributes>): boolean => {
+        const memberState = (plugin as any).component.context.getMemberState();
         if (memberState && memberState.currentApplianceName === "eraser") {
             return false;
         }

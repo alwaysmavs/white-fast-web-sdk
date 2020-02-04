@@ -3,17 +3,18 @@ import { PluginProps } from "white-web-sdk";
 import { reaction, IReactionDisposer } from "mobx";
 import "./index.less";
 import * as audio_plugin from "./image/audio_plugin.svg";
+import { PluginContext } from "./Plugins";
 export enum IdentityType {
     host = "host",
     guest = "guest",
     listener = "listener",
 }
 
-export type WhiteAudioPluginProps = PluginProps<{
+export type WhiteAudioPluginProps = PluginProps<PluginContext, {
     play: boolean;
     seek: number;
-    volume: number,
-    mute: boolean,
+    volume: number;
+    mute: boolean;
     currentTime: number;
 }>;
 
@@ -145,7 +146,7 @@ export default class WhiteAudioPluginReplay extends React.Component<WhiteAudioPl
                         <audio webkit-playsinline="true"
                             playsinline
                             className="white-plugin-audio"
-                            src={plugin.attributes.pluginAudioUrl}
+                            src={(plugin.attributes as any).pluginAudioUrl}
                             ref={this.player}
                             muted={this.state.mute}
                             style={{

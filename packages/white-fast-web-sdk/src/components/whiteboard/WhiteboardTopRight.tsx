@@ -70,8 +70,9 @@ class WhiteboardTopRight extends React.Component<WhiteboardTopRightProps, Whiteb
     }
 
     private handleDotState = (): boolean => {
+        const {roomState} = this.props;
         if (!this.props.isManagerOpen) {
-            const guestUsers: GuestUserType[] = this.props.roomState.globalState.guestUsers;
+            const guestUsers: GuestUserType[] = (roomState.globalState as any).guestUsers;
             if (guestUsers && guestUsers.length > 0) {
                 const handUpGuestUsers = guestUsers.filter((guestUser: GuestUserType) => guestUser.isHandUp);
                 return handUpGuestUsers && handUpGuestUsers.length > 0;

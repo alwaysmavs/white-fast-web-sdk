@@ -50,7 +50,7 @@ export class RoomManager {
   }
 
   private detectIsReadyOnly = (): boolean => {
-      const hostInfo: HostUserType = this.room.state.globalState.hostInfo;
+      const hostInfo: HostUserType = (this.room.state.globalState as any).hostInfo;
       if (hostInfo) {
           return hostInfo.classMode !== ClassModeType.discuss;
       } else {
@@ -60,7 +60,7 @@ export class RoomManager {
 
   public start = async (): Promise<void> => {
       if (this.identity === IdentityType.host) {
-          const hostInfo: HostUserType = this.room.state.globalState.hostInfo;
+          const hostInfo: HostUserType = (this.room.state.globalState as any).hostInfo;
           if (hostInfo) {
               this.room.setViewMode(ViewMode.Broadcaster);
               if (hostInfo.userId !== this.userId) {
@@ -103,7 +103,7 @@ export class RoomManager {
           await this.room.setWritable(false);
       } else {
           const isReadOnly = this.detectIsReadyOnly();
-          const globalGuestUsers: GuestUserType[] = this.room.state.globalState.guestUsers;
+          const globalGuestUsers: GuestUserType[] = (this.room.state.globalState as any).guestUsers;
           if (globalGuestUsers === undefined) {
               const guestUser: GuestUserType = {
                   userId: this.userId,
@@ -160,7 +160,7 @@ export class RoomManager {
   }
   public leave = (): void => {
       if (this.identity === IdentityType.guest) {
-          const guestUsers: GuestUserType[] = this.room.state.globalState.guestUsers;
+          const guestUsers: GuestUserType[] = (this.room.state.globalState as any).guestUsers;
           if (guestUsers && guestUsers.length > 0) {
               const newGuestUsers = guestUsers.map(guestUser => {
                   if (guestUser.userId === this.userId) {

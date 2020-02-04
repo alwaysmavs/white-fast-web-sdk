@@ -156,7 +156,7 @@ export default class ToolBox extends React.Component<ToolBoxProps, ToolBoxStates
 
     private isHavePpt = (): boolean => {
         const {roomState} = this.props;
-        const isHave = !!(roomState.globalState && roomState.globalState.h5PptUrl);
+        const isHave = !!(roomState.globalState && (roomState.globalState as any).h5PptUrl);
         if (isHave) {
             roomStore.isScreenZoomLock = true;
         }

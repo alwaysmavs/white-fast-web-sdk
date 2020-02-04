@@ -56,7 +56,7 @@ class WhiteboardBottomLeft extends React.Component<WhiteboardBottomLeftProps, {}
     }
     private isHavePpt = (): boolean => {
         const {roomState} = this.props;
-        return !!(roomState.globalState && roomState.globalState.h5PptUrl);
+        return !!(roomState.globalState && (roomState.globalState as any).h5PptUrl);
     }
 
     private handlePptClick = (): void => {

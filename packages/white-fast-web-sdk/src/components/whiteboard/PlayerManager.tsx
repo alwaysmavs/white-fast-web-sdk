@@ -79,7 +79,7 @@ class PlayerManager extends React.Component<PlayerManagerProps, PlayerManagerSta
     private renderGuest = (): React.ReactNode => {
         const {player, isFirstScreenReady} = this.props;
         if (player && isFirstScreenReady) {
-            const globalGuestUsers: GuestUserType[] = player.state.globalState.guestUsers;
+            const globalGuestUsers: GuestUserType[] = (player.state.globalState as any).guestUsers;
             if (globalGuestUsers) {
                 const guestNodes = globalGuestUsers.map((guestUser: GuestUserType, index: number) => {
                     return (
@@ -159,8 +159,8 @@ class PlayerManager extends React.Component<PlayerManagerProps, PlayerManagerSta
 
     private renderHostInf = (): React.ReactNode => {
         const {player, isFirstScreenReady} = this.props;
-        if (player && isFirstScreenReady && player.state.globalState.hostInfo !== undefined) {
-            const hostInfo: HostUserType = player.state.globalState.hostInfo;
+        if (player && isFirstScreenReady && (player.state.globalState as any).hostInfo !== undefined) {
+            const hostInfo: HostUserType = (player.state.globalState as any).hostInfo;
             return (
                 <div className="replay-video-box">
                     {this.renderMedia()}

@@ -52,8 +52,9 @@ export default class PlayerTopRight extends React.Component<PlayerTopRightProps,
     }
 
     private handleDotState = (): boolean => {
+        const {player} = this.props;
         if (!this.props.isManagerOpen && this.props.isFirstScreenReady) {
-            const guestUsers: GuestUserType[] = this.props.player.state.globalState.guestUsers;
+            const guestUsers: GuestUserType[] = (player.state.globalState as any).guestUsers;
             if (guestUsers && guestUsers.length > 0) {
                 const handUpGuestUsers = guestUsers.filter((guestUser: GuestUserType) => guestUser.isHandUp);
                 return handUpGuestUsers && handUpGuestUsers.length > 0;

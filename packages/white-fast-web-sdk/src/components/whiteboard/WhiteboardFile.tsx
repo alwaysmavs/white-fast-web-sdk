@@ -45,8 +45,8 @@ class WhiteboardFile extends React.Component<WhiteboardFileProps, {}> {
     private handleUpdateDocsState = (id: string, documentArray: PPTDataType[]): void => {
         const {room, uuid, roomState} = this.props;
         const activeData = documentArray.find(data => data.id === id)!;
-        if (roomState.globalState.documentArrayState) {
-            const documentArrayState: {id: string, isHaveScenes: boolean}[] = roomState.globalState.documentArrayState;
+        if ((roomState.globalState as any).documentArrayState) {
+            const documentArrayState: {id: string, isHaveScenes: boolean}[] = (roomState.globalState as any).documentArrayState;
             const activeDoc = documentArrayState.find(doc => doc.id === id);
             if (activeDoc) {
                 if (activeDoc.isHaveScenes) {

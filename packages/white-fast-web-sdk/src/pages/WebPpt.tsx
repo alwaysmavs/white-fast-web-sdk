@@ -42,7 +42,7 @@ class WebPpt extends React.Component<WebPptProps, WebPptStates> {
 
     private isHavePpt = (): boolean => {
         const {roomState} = this.props;
-        const isHave = !!(roomState.globalState && roomState.globalState.h5PptUrl);
+        const isHave = !!(roomState.globalState && (roomState.globalState as any).h5PptUrl);
         if (isHave) {
             roomStore.isScreenZoomLock = true;
         }
@@ -53,7 +53,7 @@ class WebPpt extends React.Component<WebPptProps, WebPptStates> {
         return (
             <div className="whiteboard-h5-ppt">
                 {this.isHavePpt() &&
-                <iframe  id="calculation-under" frameBorder={0} src={roomState.globalState.h5PptUrl}>
+                <iframe  id="calculation-under" frameBorder={0} src={(roomState.globalState as any).h5PptUrl}>
                 </iframe>}
             </div>
         );

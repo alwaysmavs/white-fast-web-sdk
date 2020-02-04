@@ -142,7 +142,8 @@ class WhiteboardBottomRight extends React.Component<WhiteboardBottomRightProps, 
         );
     }
     private getSelfUserInfo = (): GuestUserType | null => {
-        const globalGuestUsers: GuestUserType[] = this.props.roomState.globalState.guestUsers;
+        const {roomState} = this.props;
+        const globalGuestUsers: GuestUserType[] = (roomState.globalState as any).guestUsers;
         if (globalGuestUsers) {
             const self = globalGuestUsers.find((user: GuestUserType) => user.userId === this.props.userId);
             if (self) {
@@ -156,8 +157,8 @@ class WhiteboardBottomRight extends React.Component<WhiteboardBottomRightProps, 
     }
     private handleHandup = (mode: ClassModeType, room: Room, userId?: string): void => {
         const {roomState } = this.props;
-        const globalGuestUsers: GuestUserType[] = roomState.globalState.guestUsers;
-        const selfHostInfo: HostUserType = roomState.globalState.hostInfo;
+        const globalGuestUsers: GuestUserType[] = (roomState.globalState as any).guestUsers;
+        const selfHostInfo: HostUserType = (roomState.globalState as any).hostInfo;
         if (userId) {
             if (mode === ClassModeType.lecture && globalGuestUsers) {
                 const users = globalGuestUsers.map((user: GuestUserType) => {
@@ -210,7 +211,7 @@ class WhiteboardBottomRight extends React.Component<WhiteboardBottomRightProps, 
 
     private renderHandUpBtn = (): React.ReactNode => {
         const {room, roomState} = this.props;
-        const hostInfo = roomState.globalState.hostInfo;
+        const hostInfo = (roomState.globalState as any).hostInfo;
         if (hostInfo && hostInfo.classMode === ClassModeType.lecture && hostInfo.isAllowHandUp) {
             const user = this.getSelfUserInfo();
             if (user) {

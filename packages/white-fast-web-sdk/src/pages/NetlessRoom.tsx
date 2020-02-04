@@ -286,7 +286,7 @@ class NetlessRoom extends React.Component<NetlessRoomProps, NetlessRoomStates> i
         const {room} = this.state;
         if (room && identity === IdentityType.host) {
             room.setGlobalState({hostInfo: {
-                    ...room.state.globalState.hostInfo,
+                    ...(room.state.globalState as any).hostInfo,
                     isVideoEnable: false,
                 }});
         }
@@ -480,7 +480,7 @@ class NetlessRoom extends React.Component<NetlessRoomProps, NetlessRoomStates> i
         } else if (identity === IdentityType.host) {
             return false;
         }
-        const selfUser: GuestUserType = roomState.globalState.guestUsers.find((user: GuestUserType) => user.userId === userId);
+        const selfUser: GuestUserType = (roomState.globalState as any).guestUsers.find((user: GuestUserType) => user.userId === userId);
         if (selfUser) {
             room.disableDeviceInputs = selfUser.isReadOnly;
             return selfUser.isReadOnly;
@@ -514,17 +514,18 @@ class NetlessRoom extends React.Component<NetlessRoomProps, NetlessRoomStates> i
 
     private  documentFileCallback = (documentFile: PPTDataType): void => {
         const {documentArrayCallback} = this.props;
+        const {room} = this.state;
         const documents = this.state.documentArray.map(data => {
             data.active = false;
             return data;
         });
         this.setState({documentArray: [...documents, documentFile]});
-        if (this.state.room) {
-            if (this.state.room.state.globalState.documentArrayState) {
-                const documentArrayState = this.state.room.state.globalState.documentArrayState;
-                this.state.room.setGlobalState({documentArrayState: [...documentArrayState, {id: documentFile.id, isHaveScenes: true}]});
+        if (room) {
+            if ((room.state.globalState as any).documentArrayState) {
+                const documentArrayState = (room.state.globalState as any).documentArrayState;
+                room.setGlobalState({documentArrayState: [...documentArrayState, {id: documentFile.id, isHaveScenes: true}]});
             } else {
-                this.state.room.setGlobalState({documentArrayState: [{id: documentFile.id, isHaveScenes: true}]});
+                room.setGlobalState({documentArrayState: [{id: documentFile.id, isHaveScenes: true}]});
             }
         }
         if (documentArrayCallback) {
@@ -561,14 +562,14 @@ class NetlessRoom extends React.Component<NetlessRoomProps, NetlessRoomStates> i
             return ViewMode.Freedom;
         } else {
             if (this.props.identity === IdentityType.host) {
-                const userSelf: HostUserType = roomState.globalState.hostInfo;
+                const userSelf: HostUserType = (roomState.globalState as any).hostInfo;
                 if (userSelf) {
                     return userSelf.cameraState;
                 } else {
                     return ViewMode.Freedom;
                 }
             } else if (this.props.identity === IdentityType.guest) {
-                const userSelf: GuestUserType = roomState.globalState.guestUsers.find((user: GuestUserType) => user.userId === userId);
+                const userSelf: GuestUserType = (roomState.globalState as any).guestUsers.find((user: GuestUserType) => user.userId === userId);
                 if (userSelf) {
                     return userSelf.cameraState;
                 } else {
@@ -586,14 +587,14 @@ class NetlessRoom extends React.Component<NetlessRoomProps, NetlessRoomStates> i
             return false;
         } else {
             if (this.props.identity === IdentityType.host) {
-                const userSelf: HostUserType = roomState.globalState.hostInfo;
+                const userSelf: HostUserType = (roomState.globalState as any).hostInfo;
                 if (userSelf) {
                     return userSelf.disableCameraTransform;
                 } else {
                     return true;
                 }
             } else if (this.props.identity === IdentityType.guest) {
-                const userSelf: GuestUserType = roomState.globalState.guestUsers.find((user: GuestUserType) => user.userId === userId);
+                const userSelf: GuestUserType = (roomState.globalState as any).guestUsers.find((user: GuestUserType) => user.userId === userId);
                 if (userSelf) {
                     return userSelf.disableCameraTransform;
                 } else {
@@ -740,7 +741,7 @@ class NetlessRoom extends React.Component<NetlessRoomProps, NetlessRoomStates> i
                                 ref={this.setWhiteboardLayerDownRef.bind(this)}>
                                 <RoomWhiteboard room={room} style={{width: "100%", height: "100%"}}/>
                             </div>
-                            <WebPpt roomState={roomState} identity={this.props.identity} ppt={room.state.globalState.ppt} room={room}/>
+                            <WebPpt roomState={roomState} identity={this.props.identity} ppt={(room.state.globalState as any).ppt} room={room}/>
                         </Dropzone>
                         {!isMobile &&
                         <WhiteboardManager

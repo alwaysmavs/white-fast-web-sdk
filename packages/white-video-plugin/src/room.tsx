@@ -5,20 +5,20 @@ import "./index.less";
 import * as mute_icon from "./image/mute_icon.svg";
 import * as video_plugin from "./image/video_plugin.svg";
 import * as delete_icon from "./image/delete_icon.svg";
+import { PluginContext } from "./Plugins";
 export enum IdentityType {
     host = "host",
     guest = "guest",
     listener = "listener",
 }
 
-export type WhiteVideoPluginProps = PluginProps<{
+export type WhiteVideoPluginProps = PluginProps<PluginContext, {
     play: boolean;
     seek: number;
     volume: number,
     mute: boolean,
     currentTime: number;
 }>;
-
 
 export type WhiteVideoPluginStates = {
     play: boolean;
@@ -237,7 +237,8 @@ export default class WhiteVideoPluginRoom extends React.Component<WhiteVideoPlug
         }
     }
     private renderMuteBox = (): React.ReactNode => {
-        if (this.props.identity !== IdentityType.host) {
+        const { plugin } = this.props;
+        if (plugin.context.identity !== IdentityType.host) {
             if (this.state.selfMute) {
                 return (
                     <div className="media-mute-box">
@@ -298,7 +299,7 @@ export default class WhiteVideoPluginRoom extends React.Component<WhiteVideoPlug
                         <video webkit-playsinline="true"
                             playsInline
                             className="white-plugin-video"
-                            src={plugin.attributes.pluginVideoUrl}
+                            src={(plugin.attributes as any).pluginVideoUrl}
                             ref={this.player}
                             muted={this.state.mute ? this.state.mute : this.state.selfMute}
                             style={{

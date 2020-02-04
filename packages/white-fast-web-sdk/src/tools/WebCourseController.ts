@@ -1,4 +1,4 @@
-import {Room, Scene} from "white-web-sdk";
+import {Room, WhiteScene} from "white-web-sdk";
 export class WebCourseController {
 
     private readonly setGlobalState: (netlessState: any) => void;
@@ -34,7 +34,7 @@ export class WebCourseController {
         const newScenes = [...currentScenes];
 
         for (let i = 0; i < (pages - scenesLength); i++) {
-            newScenes.push([{name: `${scenesLength + i}`}]);
+            newScenes.push({name: `${scenesLength + i}`, componentsCount: 1});
         }
         if (pages !== scenesLength) {
             const scenePath = this.room.state.sceneState.scenePath;

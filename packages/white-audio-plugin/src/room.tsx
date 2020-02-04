@@ -5,13 +5,14 @@ import "./index.less";
 import * as mute_icon from "./image/mute_icon.svg";
 import * as audio_plugin from "./image/audio_plugin.svg";
 import * as delete_icon from "./image/delete_icon.svg";
+import { PluginContext } from "./Plugins";
 export enum IdentityType {
     host = "host",
     guest = "guest",
     listener = "listener",
 }
 
-export type WhiteAudioPluginProps = PluginProps<{
+export type WhiteAudioPluginProps = PluginProps<PluginContext, {
     play: boolean;
     seek: number;
     volume: number,
@@ -237,7 +238,8 @@ export default class WhiteAudioPluginRoom extends React.Component<WhiteAudioPlug
         }
     }
     private renderMuteBox = (): React.ReactNode => {
-        if (this.props.identity !== IdentityType.host) {
+        const { plugin } = this.props;
+        if (plugin.context.identity !== IdentityType.host) {
             if (this.state.selfMute) {
                 return (
                     <div className="media-mute-box">
@@ -298,7 +300,7 @@ export default class WhiteAudioPluginRoom extends React.Component<WhiteAudioPlug
                     <div className="white-plugin-audio-box">
                         <audio
                             className="white-plugin-aduio"
-                            src={plugin.attributes.pluginAudioUrl}
+                            src={(plugin.attributes as any).pluginAudioUrl}
                             ref={this.player}
                             muted={this.state.mute ? this.state.mute : this.state.selfMute}
                             style={{

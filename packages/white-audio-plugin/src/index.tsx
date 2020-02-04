@@ -5,13 +5,14 @@ import {PluginContext} from "./Plugins";
 import WhiteAudioPluginRoom from "./room";
 import WhiteAudioPluginReplay from "./replay";
 
-export type WhiteAudioPluginProps = PluginProps<{
+export type WhiteAudioPluginAttributes = {
     play: boolean;
     seek: number;
     volume: number,
     mute: boolean,
     currentTime: number;
-}>;
+};
+export type WhiteAudioPluginProps = PluginProps<PluginContext, WhiteAudioPluginAttributes>;
 
 class WhiteAudioPlugin extends React.Component<WhiteAudioPluginProps, {}> {
 
@@ -49,7 +50,7 @@ class WhiteAudioPlugin extends React.Component<WhiteAudioPluginProps, {}> {
     }
 }
 
-export const audioPlugin: Plugin<PluginContext, WhiteAudioPluginProps> = Object.freeze({
+export const audioPlugin: Plugin<PluginContext, WhiteAudioPluginAttributes> = Object.freeze({
     kind: "audio",
     render: WhiteAudioPlugin,
     defaultAttributes: {
@@ -59,8 +60,8 @@ export const audioPlugin: Plugin<PluginContext, WhiteAudioPluginProps> = Object.
         volume: 1,
         currentTime: 0,
     },
-    hitTest: (plugin: PluginInstance<PluginContext, WhiteAudioPluginProps>): boolean => {
-        const memberState = plugin.component.context.getMemberState();
+    hitTest: (plugin: PluginInstance<PluginContext, WhiteAudioPluginAttributes>): boolean => {
+        const memberState = (plugin as any).component.context.getMemberState();
         if (memberState && memberState.currentApplianceName === "eraser") {
             return false;
         }
